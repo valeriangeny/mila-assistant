@@ -6,7 +6,7 @@ Two roots: **`stack/`** (once per GCP project) and **`env/`** (identical per app
 
 | Root | Apply | Creates |
 | --- | --- | --- |
-| **`stack/`** | once per GCP project | APIs, AR **`todo-nonprod-api`**, WIF + **`gh-deploy-nonprod`**, SQL **`todo-nonprod-pg`**, **IAP OAuth** |
+| **`stack/`** | once per GCP project | APIs, AR **`mila-nonprod-api`**, WIF + **`gh-deploy-nonprod`**, SQL **`mila-nonprod-pg`**, **IAP OAuth** |
 | **`env/`** | once per environment | logical DB + API / MCP / agent (Cloud Run + LB using stack IAP) / FE |
 
 | Identity | State | Tfvars |
@@ -46,7 +46,7 @@ gh workflow run deploy-gcp.yml --ref dev
 | Module | Used by | Role |
 | --- | --- | --- |
 | `project_apis` | stack | Enable GCP APIs |
-| `artifact_registry` | stack | Docker repo (`todo-nonprod-api`) |
+| `artifact_registry` | stack | Docker repo (`mila-nonprod-api`) |
 | `github_deploy` | stack | Deploy SA + WIF pool |
 | `sql_instance` | stack | Cloud SQL instance (`db-f1-micro`, zonal, 10 GB HDD) |
 | `sql_database` | env | Logical DB + user on the stack instance |

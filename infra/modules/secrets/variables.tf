@@ -4,7 +4,7 @@
 
 variable "prefix" {
   type        = string
-  description = "Resource name prefix (e.g. todo-sandbox)."
+  description = "Resource name prefix (e.g. mila-sandbox)."
 }
 
 variable "labels" {

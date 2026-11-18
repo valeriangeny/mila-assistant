@@ -1,7 +1,7 @@
 {
   "dependencies": ["."],
   "graphs": {
-    "todo_agent": "./src/todo_agent/studio.py:graph"
+    "mila_agent": "./src/mila_agent/studio.py:graph"
   },
-  "env": "./config/.env.local2sandbox"
+  "env": "./config/.env.local"
 }

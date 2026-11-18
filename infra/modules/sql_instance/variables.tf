@@ -9,7 +9,7 @@ variable "project_id" {
 
 variable "instance_name" {
   type        = string
-  description = "Cloud SQL instance name (e.g. todo-nonprod-pg, todo-prod-pg)."
+  description = "Cloud SQL instance name (e.g. mila-nonprod-pg, mila-prod-pg)."
 }
 
 variable "region" {

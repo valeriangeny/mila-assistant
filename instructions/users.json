@@ -1,0 +1,30 @@
+[
+  {
+    "id": "u_alice",
+    "name": "Alice Chen",
+    "email": "alice.chen@alim.example",
+    "role": "employee",
+    "title": "Senior Research Engineer"
+  },
+  {
+    "id": "u_priya",
+    "name": "Priya Shah",
+    "email": "priya.shah@alim.example",
+    "role": "hr",
+    "title": "VP, People Operations"
+  },
+  {
+    "id": "u_marcus",
+    "name": "Marcus Liu",
+    "email": "marcus.liu@alim.example",
+    "role": "engineering",
+    "title": "Chief Technology Officer"
+  },
+  {
+    "id": "u_dana",
+    "name": "Dana Okafor",
+    "email": "dana.okafor@alim.example",
+    "role": "security",
+    "title": "Chief Information Security Officer"
+  }
+]

@@ -19,7 +19,7 @@ function deploymentUrl(): string {
 }
 
 function graphId(): string {
-  return process.env.LANGGRAPH_GRAPH_ID?.trim() || 'todo_agent';
+  return process.env.LANGGRAPH_GRAPH_ID?.trim() || 'mila_agent';
 }
 
 async function buildHandler() {
@@ -31,7 +31,7 @@ async function buildHandler() {
   // may also pick LANGSMITH_API_KEY from the environment if this is left undefined.
   const runtimeInstance = new CopilotRuntime({
     agents: {
-      todo_agent: new LangGraphAgent({
+      mila_agent: new LangGraphAgent({
         deploymentUrl: url,
         graphId: graphId(),
         langsmithApiKey: null as unknown as string | undefined,

@@ -3,10 +3,10 @@ node_modules
 npm-debug.log
 dist
 **/dist
+.next
+**/.next
 coverage
 **/coverage
-data/*.sqlite
-server/data
 .git
 .github
 .cursor
@@ -22,7 +22,6 @@ infra/**/*_override.tf
 !**/.env.*.example
 sandbox
 test-results
-redoc-report
 **/.DS_Store
 *.md
 !README.md

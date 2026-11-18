@@ -27,7 +27,7 @@ from evaluators import (  # noqa: E402
     trajectory_llm_judge,
     trajectory_subsequence,
 )
-from todo_agent.graph import run_agent  # noqa: E402
+from mila_agent.graph import run_agent  # noqa: E402
 
 DEFAULT_EVALUATORS = [
     answer_min_chars,  # static: answer length
@@ -49,7 +49,7 @@ def run_experiment(
     *,
     dataset_name: str = DEFAULT_DATASET,
     sync_local: bool = False,
-    experiment_prefix: str = "todo-agent",
+    experiment_prefix: str = "mila-agent",
     max_concurrency: int = 2,
 ):
     """Evaluate against a LangSmith dataset; results are pushed to LangSmith."""

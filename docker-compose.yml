@@ -1,42 +1,51 @@
 services:
-  todo-db:
-    image: postgres:16-alpine
+  qdrant:
+    image: qdrant/qdrant:v1.13.2
     ports:
-      - '5432:5432'
-    environment:
-      POSTGRES_DB: todo
-      POSTGRES_USER: todo
-      POSTGRES_PASSWORD: todo
+      - '6333:6333'
+      - '6334:6334'
+    volumes:
+      - qdrant_data:/qdrant/storage
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U todo -d todo']
+      test: ['CMD-SHELL', 'bash -c "exec 3<>/dev/tcp/127.0.0.1/6333"']
       interval: 5s
-      timeout: 5s
+      timeout: 3s
       retries: 10
       start_period: 5s
-    volumes:
-      - todo-pg-data:/var/lib/postgresql/data
 
-  app:
+  agent:
     build:
-      context: .
-      dockerfile: server/Dockerfile
+      context: ./agent
+      dockerfile: Dockerfile
     ports:
-      - '8080:8080'
+      - '2024:8080'
     environment:
-      APP_ENV: docker
       PORT: '8080'
-      HOST: 0.0.0.0
-      LOG_FORMAT: tiny
-      DB_DIALECT: postgres
-      DB_HOST: todo-db
-      DB_PORT: '5432'
-      DB_USER: todo
-      DB_PASSWORD: todo
-      DB_NAME: todo
-      CORS_ORIGINS: localhost,127.0.0.1
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_COLLECTION: mila_docs
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-4-hydrogen}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GOOGLE_CLOUD_PROJECT: ${GOOGLE_CLOUD_PROJECT:-}
+      GOOGLE_CLOUD_LOCATION: ${GOOGLE_CLOUD_LOCATION:-us-central1}
+      LANGSMITH_TRACING: ${LANGSMITH_TRACING:-false}
+      LANGSMITH_API_KEY: ${LANGSMITH_API_KEY:-}
+      LANGSMITH_PROJECT: ${LANGSMITH_PROJECT:-Mila Agent - compose}
     depends_on:
-      todo-db:
+      qdrant:
         condition: service_healthy
 
+  copilot:
+    build:
+      context: .
+      dockerfile: copilot/Dockerfile
+    ports:
+      - '3001:8080'
+    environment:
+      PORT: '8080'
+      LANGGRAPH_URL: http://agent:8080
+      LANGGRAPH_GRAPH_ID: mila_agent
+    depends_on:
+      - agent
+
 volumes:
-  todo-pg-data:
+  qdrant_data:

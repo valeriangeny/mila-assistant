@@ -6,8 +6,8 @@ import { Providers } from './providers';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Todo agent',
-  description: 'CopilotKit copilot over the LangGraph todo agent'
+  title: 'Mila assistant',
+  description: 'CopilotKit UI over the LangGraph Mila knowledge agent'
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

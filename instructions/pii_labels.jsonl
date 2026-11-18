@@ -1,0 +1,58 @@
+{"id": "DOC-0004", "pii": ["contact", "name"]}
+{"id": "DOC-0008", "pii": ["name"]}
+{"id": "DOC-0009", "pii": ["name"]}
+{"id": "DOC-0010", "pii": ["name"]}
+{"id": "DOC-0016", "pii": ["contact", "name"]}
+{"id": "DOC-0017", "pii": ["contact", "name"]}
+{"id": "DOC-0020", "pii": ["name"]}
+{"id": "DOC-0021", "pii": ["contact", "name"]}
+{"id": "DOC-0022", "pii": ["contact", "name"]}
+{"id": "DOC-0023", "pii": ["contact", "name"]}
+{"id": "DOC-0024", "pii": ["contact", "name"]}
+{"id": "DOC-0025", "pii": ["contact", "name"]}
+{"id": "DOC-0026", "pii": ["contact", "name"]}
+{"id": "DOC-0028", "pii": ["financial"]}
+{"id": "DOC-0029", "pii": ["financial"]}
+{"id": "DOC-0030", "pii": ["contact", "financial", "name"]}
+{"id": "DOC-0031", "pii": ["contact", "financial", "name"]}
+{"id": "DOC-0032", "pii": ["contact", "financial", "name"]}
+{"id": "DOC-0033", "pii": ["contact", "financial", "name"]}
+{"id": "DOC-0034", "pii": ["contact", "name", "sensitive_narrative"]}
+{"id": "DOC-0035", "pii": ["contact", "name", "sensitive_narrative"]}
+{"id": "DOC-0036", "pii": ["contact", "name", "sensitive_narrative"]}
+{"id": "DOC-0037", "pii": ["contact", "name", "sensitive_narrative"]}
+{"id": "DOC-0038", "pii": ["contact", "financial", "name"]}
+{"id": "DOC-0040", "pii": ["contact", "identifier", "name", "sensitive_narrative"]}
+{"id": "DOC-0041", "pii": ["contact", "name", "sensitive_narrative"]}
+{"id": "DOC-0042", "pii": ["contact", "financial", "identifier", "name"]}
+{"id": "DOC-0043", "pii": ["contact", "financial", "identifier", "name"]}
+{"id": "DOC-0044", "pii": ["name", "sensitive_narrative"]}
+{"id": "DOC-0045", "pii": ["name"]}
+{"id": "DOC-0047", "pii": ["name"]}
+{"id": "DOC-0048", "pii": ["name"]}
+{"id": "DOC-0049", "pii": ["name"]}
+{"id": "DOC-0050", "pii": ["name"]}
+{"id": "DOC-0051", "pii": ["contact", "name"]}
+{"id": "DOC-0052", "pii": ["name"]}
+{"id": "DOC-0053", "pii": ["contact", "name"]}
+{"id": "DOC-0058", "pii": ["name"]}
+{"id": "DOC-0059", "pii": ["name"]}
+{"id": "DOC-0060", "pii": ["name"]}
+{"id": "DOC-0062", "pii": ["name"]}
+{"id": "DOC-0063", "pii": ["name"]}
+{"id": "DOC-0067", "pii": ["contact", "name"]}
+{"id": "DOC-0068", "pii": ["contact", "name"]}
+{"id": "DOC-0069", "pii": ["name"]}
+{"id": "DOC-0070", "pii": ["contact", "name"]}
+{"id": "DOC-0071", "pii": ["contact", "name"]}
+{"id": "DOC-0072", "pii": ["contact", "name"]}
+{"id": "DOC-0075", "pii": ["contact", "name"]}
+{"id": "DOC-0078", "pii": ["name"]}
+{"id": "DOC-0079", "pii": ["contact", "name"]}
+{"id": "DOC-0080", "pii": ["name"]}
+{"id": "DOC-0081", "pii": ["contact", "name"]}
+{"id": "DOC-0082", "pii": ["name"]}
+{"id": "DOC-0084", "pii": ["contact", "name"]}
+{"id": "DOC-0085", "pii": ["name"]}
+{"id": "DOC-0086", "pii": ["name"]}
+{"id": "DOC-0088", "pii": ["name"]}

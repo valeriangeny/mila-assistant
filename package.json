@@ -1,43 +1,25 @@
 {
-  "name": "todo-app",
-  "version": "1.0.0",
+  "name": "mila-assistant",
+  "version": "0.1.0",
   "private": true,
-  "description": "To-do list API and web UI",
+  "description": "Permission-aware knowledge assistant for aliM AI Institute",
   "author": "Valerian Geny",
   "workspaces": [
-    "server",
-    "web",
-    "mcp",
     "copilot"
   ],
   "scripts": {
-    "start": "yarn workspace server start",
-    "dev:server": "yarn workspace server debug",
-    "dev:web": "yarn workspace web dev",
-    "dev:web:docker": "yarn workspace web dev:docker",
     "dev:copilot": "yarn workspace copilot dev",
-    "build": "yarn workspace web build",
     "build:copilot": "yarn workspace copilot build",
-    "openapi:build": "yarn workspace server openapi:build",
-    "mcp": "node --import tsx mcp/src/index.ts",
-    "mcp:http": "yarn workspace mcp start:http",
-    "mcp:inspect": "yarn workspace mcp inspect",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "test": "yarn lint && yarn test:integration && yarn test:mcp",
-    "test:integration": "yarn workspace server test",
-    "test:integration:report": "allure open test-results/allure",
-    "test:e2e": "playwright test",
-    "test:e2e:report": "playwright show-report test-results/playwright",
-    "test:mcp": "yarn workspace mcp test"
+    "lint:copilot": "yarn workspace copilot lint"
   },
   "packageManager": "yarn@1.22.22",
   "engines": {
-    "node": ">=24.0.0"
+    "node": ">=22.0.0"
   },
   "license": "UNLICENSED",
   "devDependencies": {
-    "@biomejs/biome": "2.5.15",
-    "@playwright/test": "^1.64.0"
+    "@biomejs/biome": "2.5.15"
   }
 }

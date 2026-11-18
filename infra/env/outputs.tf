@@ -9,7 +9,7 @@ output "environment" {
 
 output "resource_prefix" {
   value       = local.prefix
-  description = "Name prefix for env-scoped resources (e.g. todo-sandbox)."
+  description = "Name prefix for env-scoped resources (e.g. mila-sandbox)."
 }
 
 output "cloud_sql_instance_name" {

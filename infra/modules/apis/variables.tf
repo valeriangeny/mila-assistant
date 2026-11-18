@@ -7,7 +7,7 @@
 
 variable "prefix" {
   type        = string
-  description = "Resource name prefix (e.g. todo-sandbox)."
+  description = "Resource name prefix (e.g. mila-sandbox)."
 }
 
 variable "environment" {
@@ -90,7 +90,7 @@ variable "db_dialect" {
 variable "db_name" {
   type        = string
   description = "DB_NAME (sqlite path or postgres database name)."
-  default     = "data/todo.sqlite"
+  default     = "data/mila.sqlite"
 }
 
 variable "db_host" {

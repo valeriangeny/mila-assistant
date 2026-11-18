@@ -26,7 +26,7 @@ locals {
     "aiplatform.googleapis.com",
   ]
 
-  # AR: todo-nonprod-api. SQL: todo-nonprod-pg. SA: gh-deploy-nonprod.
+  # AR: mila-nonprod-api. SQL: mila-nonprod-pg. SA: gh-deploy-nonprod.
   prefix = "${var.name_prefix}-${var.environment}"
 
   sql_instance_id = "${var.name_prefix}-${var.environment}-pg"

@@ -7,21 +7,12 @@
   },
   "files": {
     "includes": [
-      "server/**",
-      "web/**",
-      "mcp/**",
       "copilot/**",
-      "tests/**",
-      "playwright.config.ts",
       "package.json",
       "!**/node_modules",
-      "!**/dist",
       "!**/.next",
-      "!**/coverage",
-      "!test-results",
-      "!redoc-report",
-      "!allure-report",
-      "!playwright-report"
+      "!**/dist",
+      "!**/coverage"
     ]
   },
   "formatter": {

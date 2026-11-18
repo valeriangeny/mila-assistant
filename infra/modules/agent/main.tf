@@ -2,7 +2,7 @@
 # modules/agent — LangGraph API + CopilotKit copilot behind HTTPS LB + IAP
 #
 # Access: browser Google login via IAP → LB → Cloud Run (not public run.app).
-# Runtime uses Vertex ADC (roles/aiplatform.user) + TODO_MCP_URL.
+# Runtime uses Vertex ADC (roles/aiplatform.user) + QDRANT_URL.
 # LangGraph API needs Redis + Postgres — sandbox uses Cloud Run sidecars.
 #
 # Copilot (copilot_host + copilot_image): same LB IP + IAP, serves CopilotKit.
@@ -29,7 +29,7 @@ resource "google_project_service_identity" "iap" {
 
 resource "google_service_account" "agent" {
   account_id   = "${var.prefix}-agent"
-  display_name = "Todo agent Cloud Run (${var.environment})"
+  display_name = "Mila agent Cloud Run (${var.environment})"
 }
 
 resource "google_project_iam_member" "agent_aiplatform_user" {
@@ -57,7 +57,7 @@ locals {
   plain_env = {
     APP_ENV               = var.app_env
     ENVIRONMENT           = var.environment
-    TODO_MCP_URL          = var.mcp_endpoint
+    QDRANT_URL          = var.mcp_endpoint
     GOOGLE_CLOUD_PROJECT  = var.project_id
     GOOGLE_CLOUD_LOCATION = var.region
     # LangGraph API requires Redis + Postgres (sidecars share localhost).
@@ -277,7 +277,7 @@ resource "google_compute_subnetwork_iam_member" "run_network_user" {
 
 resource "google_service_account" "copilot" {
   account_id   = "${var.prefix}-copilot"
-  display_name = "Todo CopilotKit copilot (${var.environment})"
+  display_name = "Mila CopilotKit copilot (${var.environment})"
 }
 
 resource "google_artifact_registry_repository_iam_member" "copilot_reader" {

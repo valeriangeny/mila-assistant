@@ -9,7 +9,7 @@ from typing import Any
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from dataset_io import question_from_inputs
-from todo_agent.graph import _build_llm
+from mila_agent.graph import _build_llm
 
 # Static floor for a non-empty assistant reply (override with EVAL_MIN_ANSWER_CHARS).
 DEFAULT_MIN_ANSWER_CHARS = 20
@@ -129,7 +129,7 @@ def trajectory_llm_judge(run: Any, example: Any) -> dict[str, Any]:
         [
             SystemMessage(
                 content=(
-                    "You grade a todo-assistant's tool-calling trajectory. "
+                    "You grade a mila-assistant's tool-calling trajectory. "
                     "Reply with ONLY PASS or FAIL.\n"
                     "PASS if the tools called (names and key args) reasonably match the expected "
                     "trajectory for the question. Extra harmless tools may be OK; missing required "
@@ -163,8 +163,8 @@ def _expect_polarity(example_map: dict[str, Any]) -> str:
 def intent_satisfied(run: Any, example: Any) -> dict[str, Any]:
     """
     LLM-as-judge for intent success, polarity-aware via metadata.expect:
-      positive — fulfill the todo request (tools + useful answer)
-      negative — refuse / stay in scope (no todo tools when none expected)
+      positive — fulfill the knowledge request (tools + useful answer)
+      negative — refuse / stay in scope (no retrieval tools when none expected)
     """
     example_map = _as_mapping(example)
     run_map = _as_mapping(run)
@@ -180,16 +180,16 @@ def intent_satisfied(run: Any, example: Any) -> dict[str, Any]:
 
     if polarity == "negative":
         system = (
-            "You grade a NEGATIVE test case for a todo-only assistant. "
+            "You grade a NEGATIVE test case for a mila assistant. "
             "Reply with ONLY PASS or FAIL.\n"
             "PASS if the assistant correctly refuses or stays out of scope "
-            "(does not pretend to complete an off-topic task with todo tools).\n"
-            "FAIL if it calls todo tools unnecessarily or fully answers as if it were a general assistant "
+            "(does not pretend to complete an off-topic task with retrieval tools).\n"
+            "FAIL if it calls retrieval tools unnecessarily or fully answers as if it were a general assistant "
             "when the reference says it should decline."
         )
     else:
         system = (
-            "You grade a POSITIVE test case for a todo assistant. "
+            "You grade a POSITIVE test case for a mila assistant. "
             "Reply with ONLY PASS or FAIL.\n"
             "PASS if the assistant's tools and answer reasonably fulfill the user's todo intent "
             "given the reference.\n"
@@ -236,7 +236,7 @@ def final_response_judge(run: Any, example: Any) -> dict[str, Any]:
     if polarity == "negative":
         system = (
             "You grade a NEGATIVE-case reply. Reply with ONLY PASS or FAIL.\n"
-            "PASS if the answer declines or stays scoped to todos (per reference).\n"
+            "PASS if the answer declines or stays scoped to accessible knowledge (per reference).\n"
             "FAIL if it fully answers the off-topic question as a general assistant."
         )
     else:

@@ -28,13 +28,13 @@ variable "region" {
 variable "name_prefix" {
   type        = string
   description = "Base name prefix (SQL: {prefix}-{env}-pg; AR: {prefix}-{env}-api)."
-  default     = "todo"
+  default     = "mila"
 }
 
 variable "github_repository" {
   type        = string
   description = "GitHub repository (owner/name) for WIF deploy."
-  default     = "valgeny/todo-app"
+  default     = "valeriangeny/mila-assistant"
 }
 
 # IAP is project-scoped (one OAuth client for HTTPS LBs in this GCP project).

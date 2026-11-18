@@ -1,16 +1,18 @@
 # copilot (CopilotKit)
 
-Next.js app (chat page + CopilotKit runtime BFF) over our **self-hosted** LangGraph Agent Server (`todo_agent` graph on Cloud Run / local).
+Next.js chat UI + CopilotKit runtime BFF over the self-hosted **LangGraph Agent Server** (`mila_agent`).
 
-This is **not** LangGraph Platform (no LangSmith Deployment / hosted “dev” or “prod” deployments). CopilotKit talks to our Agent Server URL; auth in cloud is Cloud Run IAM (ID token), not a LangSmith API key.
+This is **not** LangGraph Platform. CopilotKit talks to our Agent Server URL; LangSmith is optional tracing on the agent side only.
 
 ## Local
 
 ```bash
-# Terminal 1 — self-hosted Agent Server (from agent/)
+# Terminal 1 — Agent Server (from agent/)
+uv sync --extra dev
 uv run langgraph dev
 
-# Terminal 2 — copilot
+# Terminal 2 — copilot (repo root)
+yarn install
 yarn dev:copilot
 # http://localhost:3001
 ```
@@ -19,13 +21,7 @@ yarn dev:copilot
 
 ```bash
 LANGGRAPH_URL=http://127.0.0.1:2024
-LANGGRAPH_GRAPH_ID=todo_agent
+LANGGRAPH_GRAPH_ID=mila_agent
 ```
 
-Browser → `/api/copilotkit` (same origin). Next.js runtime → `LANGGRAPH_URL` (server-side).
-
-## Cloud Run + IAP
-
-Public: `https://copilot.valeriangeny.dev` (IAP). Runtime calls the Agent Server Cloud Run URL (`LANGGRAPH_URL=https://…run.app`) with a Google ID token from the metadata server. The copilot service account has `roles/run.invoker` on the agent.
-
-`LANGSMITH_API_KEY` may exist on the **agent** for tracing only; copilot must not use it as LangGraph Platform credentials.
+Or bring everything up with root `docker compose up --build`.

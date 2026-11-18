@@ -26,7 +26,7 @@ from run_eval import run_experiment  # noqa: E402
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line(
         "markers",
-        "langsmith: needs LANGSMITH_API_KEY, TODO_MCP_URL, and Gemini auth; pushes to LangSmith",
+        "langsmith: needs LANGSMITH_API_KEY and Gemini auth; pushes to LangSmith",
     )
 
 
@@ -40,8 +40,6 @@ def langsmith_ready(agent_env: None) -> None:
     missing = []
     if not os.environ.get("LANGSMITH_API_KEY"):
         missing.append("LANGSMITH_API_KEY")
-    if not os.environ.get("TODO_MCP_URL"):
-        missing.append("TODO_MCP_URL")
     if not os.environ.get("GOOGLE_API_KEY") and not os.environ.get("GOOGLE_CLOUD_PROJECT"):
         missing.append("GOOGLE_API_KEY or GOOGLE_CLOUD_PROJECT")
     if missing:
@@ -55,7 +53,7 @@ def langsmith_client(langsmith_ready: None) -> Client:
 
 @pytest.fixture
 def dataset_name() -> str:
-    return os.environ.get("TODO_EVAL_DATASET", DEFAULT_DATASET)
+    return os.environ.get("MILA_EVAL_DATASET", DEFAULT_DATASET)
 
 
 @pytest.fixture
@@ -71,7 +69,7 @@ def push_eval_to_langsmith(
             results = push_eval_to_langsmith(sync_local=True)
     """
 
-    def _run(*, sync_local: bool = True, experiment_prefix: str = "todo-agent-pytest"):
+    def _run(*, sync_local: bool = True, experiment_prefix: str = "mila-agent-pytest"):
         return run_experiment(
             langsmith_client,
             dataset_name=dataset_name,

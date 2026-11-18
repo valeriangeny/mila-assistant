@@ -61,8 +61,8 @@ module "sql_database" {
   source = "../modules/sql_database"
 
   instance_name = var.sql_instance_name
-  db_name       = "todo_${var.environment}"
-  db_user       = "todo_${var.environment}"
+  db_name       = "mila_${var.environment}"
+  db_user       = "mila_${var.environment}"
 }
 
 module "secrets" {

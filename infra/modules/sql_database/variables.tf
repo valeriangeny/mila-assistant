@@ -4,7 +4,7 @@
 
 variable "instance_name" {
   type        = string
-  description = "Existing Cloud SQL instance name (e.g. todo-nonprod-pg)."
+  description = "Existing Cloud SQL instance name (e.g. mila-nonprod-pg)."
 }
 
 variable "db_name" {

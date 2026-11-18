@@ -9,7 +9,7 @@ data "google_project" "current" {
 resource "google_artifact_registry_repository" "api" {
   location      = var.region
   repository_id = "${var.prefix}-api"
-  description   = "Todo API container images (${var.environment})"
+  description   = "Mila API container images (${var.environment})"
   format        = "DOCKER"
   labels        = var.labels
 }

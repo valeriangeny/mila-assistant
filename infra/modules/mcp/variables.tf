@@ -4,7 +4,7 @@
 
 variable "prefix" {
   type        = string
-  description = "Resource name prefix (e.g. todo-sandbox)."
+  description = "Resource name prefix (e.g. mila-sandbox)."
 }
 
 variable "environment" {
@@ -30,7 +30,7 @@ variable "image" {
 
 variable "api_uri" {
   type        = string
-  description = "Todo REST API base URL (injected as TODO_API_ORIGIN)."
+  description = "Todo REST API base URL (injected as MILA_API_ORIGIN)."
 }
 
 variable "artifact_registry_location" {

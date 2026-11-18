@@ -28,7 +28,7 @@ variable "region" {
 variable "name_prefix" {
   type        = string
   description = "Base name prefix (apps: {prefix}-{env}-…)."
-  default     = "todo"
+  default     = "mila"
 }
 
 variable "sql_instance_name" {

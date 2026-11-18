@@ -9,7 +9,7 @@ output "environment" {
 
 output "resource_prefix" {
   value       = local.prefix
-  description = "Name prefix (e.g. todo-nonprod)."
+  description = "Name prefix (e.g. mila-nonprod)."
 }
 
 output "cloud_sql_instance_name" {

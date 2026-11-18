@@ -12,7 +12,7 @@ from langsmith import Client
 
 EVALS_DIR = Path(__file__).resolve().parent
 DATASETS_DIR = EVALS_DIR / "datasets"
-DEFAULT_DATASET = "todo-agent-v1"
+DEFAULT_DATASET = "mila-agent-v1"
 
 # LangGraph Studio / chat experiments expect inputs.messages (not inputs.question).
 INPUTS_SCHEMA = {
@@ -128,7 +128,7 @@ def ensure_remote_dataset(client: Client, name: str, description: str | None = N
         return existing[name]
     return client.create_dataset(
         dataset_name=name,
-        description=description or f"Todo agent eval dataset ({name})",
+        description=description or f"Mila agent eval dataset ({name})",
         data_type="kv",
         inputs_schema=INPUTS_SCHEMA,
         outputs_schema=OUTPUTS_SCHEMA,
@@ -181,8 +181,6 @@ def require_langsmith_env() -> None:
 
 def require_eval_env() -> None:
     require_langsmith_env()
-    if not os.environ.get("TODO_MCP_URL"):
-        raise SystemExit("Set TODO_MCP_URL (MCP Streamable HTTP endpoint)")
     # Empty GOOGLE_API_KEY= in dotenv should not block Vertex + ADC.
     api_key = (os.environ.get("GOOGLE_API_KEY") or "").strip()
     if not api_key:

@@ -1,7 +1,6 @@
 # CopilotKit Next.js BFF. Build from repo root:
-#   docker build -f copilot/Dockerfile -t …/todo-sandbox-copilot:latest .
+#   docker build -f copilot/Dockerfile -t mila-copilot:latest .
 
-# Root package.json engines require Node >=24.
 FROM node:24-bookworm-slim AS build
 WORKDIR /app
 COPY package.json yarn.lock ./

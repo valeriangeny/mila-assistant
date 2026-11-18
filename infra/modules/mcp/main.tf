@@ -1,13 +1,13 @@
 # -----------------------------------------------------------------------------
 # modules/mcp — Cloud Run Streamable HTTP MCP server (calls the Todo REST API)
 #
-# Separate from modules/apis: different image, no DB, TODO_API_ORIGIN env.
+# Separate from modules/apis: different image, no DB, MILA_API_ORIGIN env.
 # Uses the same Artifact Registry repo as the API (image name {prefix}-mcp).
 # -----------------------------------------------------------------------------
 
 resource "google_service_account" "mcp" {
   account_id   = "${var.prefix}-mcp"
-  display_name = "Todo MCP Cloud Run (${var.environment})"
+  display_name = "Mila MCP Cloud Run (${var.environment})"
 }
 
 # Cloud Run service agent AR reader is granted by modules/artifact_registry.
@@ -31,7 +31,7 @@ locals {
   plain_env = {
     APP_ENV         = var.app_env
     ENVIRONMENT     = var.environment
-    TODO_API_ORIGIN = var.api_uri
+    MILA_API_ORIGIN = var.api_uri
   }
 }
 

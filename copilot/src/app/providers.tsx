@@ -8,12 +8,12 @@ import '@copilotkit/react-ui/styles.css';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <CopilotKit runtimeUrl="/api/copilotkit" agent="todo_agent" useSingleEndpoint={false}>
+    <CopilotKit runtimeUrl="/api/copilotkit" agent="mila_agent" useSingleEndpoint={false}>
       <CopilotSidebar
         defaultOpen
         labels={{
-          title: 'Todo agent',
-          initial: 'Ask me to list, add, or update todos.'
+          title: 'Mila assistant',
+          initial: 'Ask about aliM AI Institute policies, docs, or teams. (Knowledge index lands in Phase 2.)'
         }}
       >
         {children}

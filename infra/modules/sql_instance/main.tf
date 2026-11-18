@@ -1,8 +1,8 @@
 # -----------------------------------------------------------------------------
 # modules/sql_instance — cheapest Cloud SQL Postgres for Cloud Run (Unix socket)
 #
-# nonprod stack → todo-nonprod-pg (shared by sandbox + staging)
-# prod stack    → todo-prod-pg
+# nonprod stack → mila-nonprod-pg (shared by sandbox + staging)
+# prod stack    → mila-prod-pg
 # -----------------------------------------------------------------------------
 
 resource "google_sql_database_instance" "main" {

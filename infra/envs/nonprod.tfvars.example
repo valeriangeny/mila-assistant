@@ -9,9 +9,9 @@
 project_id  = "your-gcp-project-id"
 environment = "nonprod"
 region      = "us-central1"
-name_prefix = "todo"
+name_prefix = "mila"
 
-github_repository = "valgeny/todo-app"
+github_repository = "valeriangeny/mila-assistant"
 
 # IAP (project-scoped). Create OAuth 2.0 Web client in APIs & Services → Credentials.
 # Redirect URI: https://iap.googleapis.com/v1/oauth/clientIds/<CLIENT_ID>:handleRedirect

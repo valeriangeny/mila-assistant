@@ -24,7 +24,7 @@ locals {
 
 resource "google_service_account" "api" {
   account_id   = "${var.prefix}-api"
-  display_name = "Todo API Cloud Run (${var.environment})"
+  display_name = "Mila API Cloud Run (${var.environment})"
 }
 
 resource "google_artifact_registry_repository_iam_member" "api_reader" {

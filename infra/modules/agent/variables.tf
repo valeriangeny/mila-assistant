@@ -9,7 +9,7 @@ variable "project_id" {
 
 variable "prefix" {
   type        = string
-  description = "Resource name prefix (e.g. todo-sandbox)."
+  description = "Resource name prefix (e.g. mila-sandbox)."
 }
 
 variable "environment" {
@@ -35,7 +35,7 @@ variable "image" {
 
 variable "mcp_endpoint" {
   type        = string
-  description = "TODO_MCP_URL — Streamable HTTP MCP endpoint."
+  description = "QDRANT_URL — Streamable HTTP MCP endpoint."
 }
 
 variable "artifact_registry_location" {
@@ -87,7 +87,7 @@ variable "copilot_image" {
 variable "copilot_graph_id" {
   type        = string
   description = "LANGGRAPH_GRAPH_ID / CopilotKit agent key (must match langgraph.json)."
-  default     = "todo_agent"
+  default     = "mila_agent"
 }
 
 variable "iap_oauth_client_id" {
