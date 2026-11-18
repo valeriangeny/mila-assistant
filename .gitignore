@@ -57,3 +57,6 @@ sandbox/
 test-results/
 coverage/
 **/coverage/
+
+# Local MCP secrets
+.cursor/mcp.json

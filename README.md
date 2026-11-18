@@ -33,6 +33,18 @@ yarn install && yarn dev:copilot   # :3001
 | Agent Server | http://127.0.0.1:2024 |
 | Copilot | http://127.0.0.1:3001 |
 
-**Next:** `ingest/` → populate Qdrant; then RBAC + PII policy.
+## Vector DB (Qdrant) + local embeddings
+
+Embeddings use **FastEmbed** in-process (`BAAI/bge-small-en-v1.5`) — no embed API key. Gemini is only for the chat LLM.
+
+```bash
+docker compose up -d qdrant
+cd ingest && uv sync
+uv run mila-ingest --recreate
+```
+
+Or: `docker compose --profile ingest run --rm ingest`
+
+See [`ingest/README.md`](ingest/README.md). Next: RBAC + PII policy.
 
 See [`instructions/Take-Home Assignment.md`](instructions/Take-Home%20Assignment.md).

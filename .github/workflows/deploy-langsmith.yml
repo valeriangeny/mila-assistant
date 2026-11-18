@@ -41,9 +41,13 @@ jobs:
         # vars are reserved and injected by the platform.
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_CLOUD_PROJECT: ${{ vars.GOOGLE_CLOUD_PROJECT }}
+          GOOGLE_CLOUD_LOCATION: ${{ vars.GOOGLE_CLOUD_LOCATION || 'us-central1' }}
           QDRANT_URL: ${{ vars.QDRANT_URL }}
           QDRANT_COLLECTION: ${{ vars.QDRANT_COLLECTION || 'mila_docs' }}
+          EMBEDDING_MODEL: ${{ vars.EMBEDDING_MODEL || 'BAAI/bge-small-en-v1.5' }}
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-4-hydrogen' }}
+          GEMINI_THINKING_LEVEL: ${{ vars.GEMINI_THINKING_LEVEL || 'medium' }}
           AGENT_TZ: ${{ vars.AGENT_TZ }}
           ENV: ${{ vars.ENV }}
           HOSTING: ${{ vars.HOSTING }}
@@ -57,8 +61,12 @@ jobs:
           {
             echo "GOOGLE_API_KEY=${GOOGLE_API_KEY}"
             echo "GEMINI_MODEL=${GEMINI_MODEL}"
+            echo "GEMINI_THINKING_LEVEL=${GEMINI_THINKING_LEVEL}"
+            echo "EMBEDDING_MODEL=${EMBEDDING_MODEL}"
             echo "ENVIRONMENT=${LABEL}"
             echo "APP_ENV=${LABEL}"
+            if [ -n "${GOOGLE_CLOUD_PROJECT}" ]; then echo "GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}"; fi
+            if [ -n "${GOOGLE_CLOUD_LOCATION}" ]; then echo "GOOGLE_CLOUD_LOCATION=${GOOGLE_CLOUD_LOCATION}"; fi
             if [ -n "${QDRANT_URL}" ]; then echo "QDRANT_URL=${QDRANT_URL}"; fi
             if [ -n "${QDRANT_COLLECTION}" ]; then echo "QDRANT_COLLECTION=${QDRANT_COLLECTION}"; fi
             if [ -n "${AGENT_TZ}" ]; then echo "AGENT_TZ=${AGENT_TZ}"; fi

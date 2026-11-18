@@ -1,8 +1,4 @@
-"""Knowledge retrieval tool.
-
-Phase 1: stub that accepts `role` (for future RBAC pre-filters) but does not
-query Qdrant yet. Phase 2 wires Qdrant; Phase 3 enforces policy.
-"""
+"""Knowledge retrieval tool backed by Qdrant."""
 
 from __future__ import annotations
 
@@ -10,6 +6,8 @@ import json
 from typing import Literal
 
 from langchain_core.tools import tool
+
+from mila_agent.qdrant_search import search_knowledge
 
 Role = Literal["employee", "hr", "engineering", "security"]
 
@@ -24,15 +22,14 @@ def retrieve_knowledge(
     Always pass the caller's verified role. Authorization filters will use it;
     do not invent a more privileged role.
     """
-    payload = {
-        "status": "not_indexed",
-        "message": (
-            "Ingest has not populated Qdrant yet. No documents retrieved. "
-            "Answer only from general knowledge is disallowed — say you have "
-            "no accessible sources."
-        ),
-        "query": query,
-        "role": role,
-        "hits": [],
-    }
+    try:
+        payload = search_knowledge(query, role=role)
+    except Exception as exc:  # noqa: BLE001 — surface to the agent
+        payload = {
+            "status": "error",
+            "message": str(exc),
+            "query": query,
+            "role": role,
+            "hits": [],
+        }
     return json.dumps(payload)

@@ -6,17 +6,19 @@ readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "Valerian Geny" }]
 dependencies = [
-  "langchain-core>=0.3.0",
-  "langchain-google-genai>=2.0.0",
-  "langgraph>=0.3.0",
-  "langsmith>=0.3.0",
+  "fastembed>=0.9.0",
+  "langchain-core>=1.8.0",
+  "langchain-google-genai>=4.5.0",
+  "langgraph>=1.2.22",
+  "langsmith>=0.15.0",
   "python-dotenv>=1.0.0",
+  "qdrant-client>=1.12.0",
 ]
 
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0.0",
-  "langgraph-cli[inmem]>=0.2.0",
+  "langgraph-cli[inmem]>=0.4.43",
 ]
 
 [project.scripts]

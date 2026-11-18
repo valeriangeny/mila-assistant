@@ -10,8 +10,9 @@ LangSmith is optional (tracing / evals / Studio). The runner is the **LangGraph 
 | --- | --- |
 | Orchestration | LangGraph (`create_react_agent`) |
 | LLM | Gemini via `langchain-google-genai` (API key or Vertex ADC) |
-| Tools | `retrieve_knowledge(query, role)` — stub until ingest |
-| Vector DB | Qdrant (compose service; wired in Phase 2) |
+| Embeddings | FastEmbed `BAAI/bge-small-en-v1.5` (local, 384-d) |
+| Tools | `retrieve_knowledge(query, role)` → Qdrant vector search |
+| Vector DB | Qdrant (`docker compose up -d qdrant` + `ingest/`) |
 | Evals | LangSmith datasets (optional) |
 
 ## Setup
@@ -51,3 +52,5 @@ docker compose up --build
 - Qdrant: http://127.0.0.1:6333
 - Agent: http://127.0.0.1:2024
 - Copilot UI: http://127.0.0.1:3001
+
+Populate the index first (`cd ingest && uv run mila-ingest --recreate`) so retrieval returns hits.
