@@ -19,7 +19,8 @@ def retrieve_knowledge(
 ) -> str:
     """Search the internal knowledge base for documents relevant to the query.
 
-    Always pass the caller's verified role. Authorization filters will use it;
+    Always pass the caller's verified role unchanged. Access is enforced in
+    Qdrant via intended_audience + sensitivity allow-lists (see access_policy);
     do not invent a more privileged role.
     """
     try:
