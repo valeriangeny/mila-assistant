@@ -1,10 +1,12 @@
 export default function HomePage() {
   return (
-    <main style={{ padding: '2rem', maxWidth: 40 * 16, fontFamily: 'system-ui, sans-serif' }}>
-      <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Mila assistant</h1>
-      <p style={{ color: '#444', lineHeight: 1.5 }}>
-        Chat is in the sidebar. The browser only talks to this host (<code>/api/copilotkit</code>);
-        the Next.js runtime calls your LangGraph Agent Server server-side.
+    <main className="mila-main">
+      <h1>Mila assistant</h1>
+      <p>
+        Auth demos: top-bar <strong>Sign in</strong>, or in chat say “sign me
+        in” / “switch user” for a card that redirects to the mock IdP (Alice /
+        Priya / Marcus / Dana). The verified <code>role</code> is passed into
+        the agent for retrieval filters.
       </p>
     </main>
   );

@@ -55,6 +55,13 @@ sandbox/
 
 # Generated reports and test outputs
 test-results/
+**/test-results/
+playwright-report/
+**/playwright-report/
+blob-report/
+**/blob-report/
+playwright/.cache/
+**/playwright/.cache/
 coverage/
 **/coverage/
 

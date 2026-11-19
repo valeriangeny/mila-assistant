@@ -6,9 +6,9 @@
       "version": "3.12"
     }
   },
-  "forwardPorts": [3001, 2024],
+  "forwardPorts": [4000, 2024],
   "portsAttributes": {
-    "3001": {
+    "4000": {
       "label": "Copilot UI",
       "onAutoForward": "openBrowser"
     },

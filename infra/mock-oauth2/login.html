@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mila mock IdP — pick a user</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4f1ea;
+        --ink: #1a1a1a;
+        --muted: #5c5c5c;
+        --card: #fff;
+        --line: #d9d3c7;
+        --accent: #0b3d2e;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        background: radial-gradient(1200px 600px at 10% -10%, #e7efe9, transparent),
+          var(--bg);
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+        padding: 2rem;
+      }
+      main {
+        width: min(28rem, 100%);
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.5rem;
+      }
+      h1 {
+        font-size: 1.25rem;
+        margin: 0 0 0.35rem;
+      }
+      p {
+        margin: 0 0 1.25rem;
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.4;
+      }
+      .personas {
+        display: grid;
+        gap: 0.65rem;
+      }
+      button.persona {
+        appearance: none;
+        width: 100%;
+        text-align: left;
+        border: 1px solid var(--line);
+        background: #faf8f4;
+        border-radius: 8px;
+        padding: 0.85rem 1rem;
+        cursor: pointer;
+        font: inherit;
+      }
+      button.persona:hover {
+        border-color: var(--accent);
+        background: #eef5f1;
+      }
+      button.persona strong {
+        display: block;
+        color: var(--accent);
+      }
+      button.persona span {
+        display: block;
+        margin-top: 0.2rem;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      .manual {
+        margin-top: 1.25rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--line);
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .manual code {
+        font-size: 0.8rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Sign in to Mila (mock IdP)</h1>
+      <p>
+        No password. Pick a sample identity from
+        <code>instructions/users.json</code>. The mock IdP issues a token with
+        that user’s <code>role</code> claim.
+      </p>
+      <form id="login" method="post" class="personas">
+        <input type="hidden" name="username" id="username" value="" />
+        <!-- password is unused by mock-oauth2-server matching; kept for form compatibility -->
+        <input type="hidden" name="password" value="" />
+
+        <button class="persona" type="submit" data-user="alice">
+          <strong>Alice Chen</strong>
+          <span>alice · employee · Senior Research Engineer</span>
+        </button>
+        <button class="persona" type="submit" data-user="priya">
+          <strong>Priya Shah</strong>
+          <span>priya · hr · VP, People Operations</span>
+        </button>
+        <button class="persona" type="submit" data-user="marcus">
+          <strong>Marcus Liu</strong>
+          <span>marcus · engineering · CTO</span>
+        </button>
+        <button class="persona" type="submit" data-user="dana">
+          <strong>Dana Okafor</strong>
+          <span>dana · security · CISO</span>
+        </button>
+      </form>
+      <div class="manual">
+        Usernames: <code>alice</code>, <code>priya</code>, <code>marcus</code>,
+        <code>dana</code>
+      </div>
+    </main>
+    <script>
+      document.querySelectorAll("button.persona").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.getElementById("username").value = btn.dataset.user;
+        });
+      });
+    </script>
+  </body>
+</html>
