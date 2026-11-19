@@ -43,13 +43,13 @@ def _dynamic_prompt(state: Any) -> list[BaseMessage]:
 
 def _build_llm(model_name: str | None = None) -> ChatGoogleGenerativeAI:
     # Prefer Gemini 4 Hydrogen over 3.8 (capacity) / 3.7 (deprecated → 3.8).
-    model_id = model_name or os.environ.get("GEMINI_MODEL", "gemini-4-hydrogen")
+    model_id = model_name or os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
     api_key = (os.environ.get("GOOGLE_API_KEY") or "").strip()
     # Gemini 4 rejects/ignores sampling knobs; omit temperature for those models.
     # Default thinking is high (~slow TTFT); medium is better for interactive RAG chat.
     kwargs: dict = {"model": model_id}
     if model_id.startswith("gemini-4"):
-        level = (os.environ.get("GEMINI_THINKING_LEVEL") or "medium").strip() or "medium"
+        level = (os.environ.get("GEMINI_THINKING_LEVEL") or "low").strip() or "low"
         kwargs["thinking_level"] = level
     else:
         kwargs["temperature"] = 0
