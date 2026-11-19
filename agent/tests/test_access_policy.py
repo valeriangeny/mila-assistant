@@ -32,7 +32,13 @@ def test_normalize_role(raw: str | None, expected: str) -> None:
 
 
 def test_known_roles_cover_sample_users() -> None:
-    assert set(known_roles()) == {"employee", "hr", "engineering", "security"}
+    assert set(known_roles()) == {
+        "public",
+        "employee",
+        "hr",
+        "engineering",
+        "security",
+    }
 
 
 def test_policy_vocab_is_subset_of_dictionary() -> None:
@@ -44,6 +50,12 @@ def test_policy_vocab_is_subset_of_dictionary() -> None:
 @pytest.mark.parametrize(
     ("role", "audience", "sensitivity", "allowed"),
     [
+        # public (incognito): company-wide + public only
+        ("public", "company-wide", "public", True),
+        ("public", "company-wide", "internal", False),
+        ("public", "company-wide", "confidential", False),
+        ("public", "people-ops", "public", False),
+        ("public", "engineering", "public", False),
         # employee: company-wide public/internal only
         ("employee", "company-wide", "public", True),
         ("employee", "company-wide", "internal", True),

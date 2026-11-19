@@ -12,7 +12,9 @@
     "build:copilot": "yarn workspace copilot build",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "lint:copilot": "yarn workspace copilot lint"
+    "lint:copilot": "yarn workspace copilot lint",
+    "test:e2e": "yarn --cwd e2e test",
+    "test:e2e:auth": "yarn --cwd e2e test auth-"
   },
   "packageManager": "yarn@1.22.22",
   "engines": {
