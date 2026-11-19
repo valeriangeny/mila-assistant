@@ -1,4 +1,4 @@
-"""Query Qdrant for knowledge chunks (RBAC filters added in Phase 3)."""
+"""Query Qdrant for knowledge chunks (role-filtered vector search)."""
 
 from __future__ import annotations
 
@@ -8,6 +8,8 @@ from typing import Any
 
 from fastembed import TextEmbedding
 from qdrant_client import QdrantClient
+
+from mila_agent.access_policy import normalize_role, qdrant_filter_for_role
 
 DEFAULT_COLLECTION = "mila_docs"
 EMBEDDING_DIM = 384
@@ -49,9 +51,15 @@ def search_knowledge(
     role: str,
     top_k: int = 5,
 ) -> dict[str, Any]:
-    """Vector search. `role` is accepted for Phase 3 pre-filters (unused yet)."""
+    """Vector search with payload filter from ``access_policy`` for ``role``.
+
+    ``role`` should be a verified caller role; unknown roles fall back to
+    employee (least privilege). See ``mila_agent.access_policy``.
+    """
     url = _qdrant_url()
     collection = _collection()
+    verified_role = normalize_role(role)
+    query_filter = qdrant_filter_for_role(verified_role)
     client = QdrantClient(url=url, check_compatibility=False)
 
     try:
@@ -61,7 +69,7 @@ def search_knowledge(
             "status": "qdrant_unreachable",
             "message": f"Cannot reach Qdrant at {url}: {exc}",
             "query": query,
-            "role": role,
+            "role": verified_role,
             "hits": [],
         }
 
@@ -73,7 +81,7 @@ def search_knowledge(
                 "`cd ingest && uv run mila-ingest --recreate`"
             ),
             "query": query,
-            "role": role,
+            "role": verified_role,
             "hits": [],
         }
 
@@ -82,6 +90,7 @@ def search_knowledge(
         response = client.query_points(
             collection_name=collection,
             query=vector,
+            query_filter=query_filter,
             limit=top_k,
             with_payload=True,
         )
@@ -90,6 +99,7 @@ def search_knowledge(
         points = client.search(
             collection_name=collection,
             query_vector=vector,
+            query_filter=query_filter,
             limit=top_k,
             with_payload=True,
         )
@@ -114,9 +124,9 @@ def search_knowledge(
 
     return {
         "status": "ok" if hits else "empty",
-        "message": None if hits else "No matching chunks for this query.",
+        "message": None if hits else "No matching chunks for this query under current access.",
         "query": query,
-        "role": role,
+        "role": verified_role,
         "collection": collection,
         "hits": hits,
     }
