@@ -8,6 +8,7 @@ from mila_agent.pii_policy import (
     anonymize_hit,
     anonymize_hits,
     anonymize_text,
+    llm_safe_hit,
     pii_action_for,
 )
 
@@ -25,35 +26,41 @@ def test_pii_action_matrix_smoke() -> None:
 def test_mask_name_for_public() -> None:
     text = "Priya contacted support."
     spans = [{"start": 0, "end": 5, "category": "name"}]
-    safe, refused = anonymize_text(text, spans, role="public")
+    safe, refused, transformations = anonymize_text(text, spans, role="public")
     assert not refused
     assert safe.startswith("<NAME>")
     assert "Priya" not in safe
+    assert transformations[0]["original"] == "Priya"
+    assert transformations[0]["replacement"] == "<NAME>"
 
 
 def test_allow_name_for_employee() -> None:
     text = "Priya contacted support."
     spans = [{"start": 0, "end": 5, "category": "name"}]
-    safe, refused = anonymize_text(text, spans, role="employee")
+    safe, refused, transformations = anonymize_text(text, spans, role="employee")
     assert not refused
     assert safe == text
+    assert transformations == []
 
 
 def test_redact_identifier() -> None:
     text = "SSN 123-45-6789 on file."
     spans = [{"start": 4, "end": 15, "category": "identifier"}]
-    safe, refused = anonymize_text(text, spans, role="employee")
+    safe, refused, transformations = anonymize_text(text, spans, role="employee")
     assert not refused
     assert "123-45-6789" not in safe
     assert "SSN" in safe
+    assert transformations[0]["action"] == "redact"
+    assert transformations[0]["original"] == "123-45-6789"
 
 
 def test_refuse_sensitive_narrative_for_public() -> None:
     text = "Performance notes about Dana."
     spans = [{"start": 0, "end": len(text), "category": "sensitive_narrative"}]
-    safe, refused = anonymize_text(text, spans, role="public")
+    safe, refused, transformations = anonymize_text(text, spans, role="public")
     assert refused
     assert safe == ""
+    assert transformations == []
 
 
 def test_anonymize_hit_drops_refused() -> None:
@@ -69,6 +76,23 @@ def test_anonymize_hit_drops_refused() -> None:
     assert kept is not None
     assert kept["text"] == "secret review"
     assert kept["pii_applied"] is True
+    assert "pii_spans" not in kept
+
+
+def test_llm_safe_hit_strips_audit() -> None:
+    hit = anonymize_hit(
+        {
+            "doc_id": "DOC-1",
+            "text": "a@b.com",
+            "pii_spans": [{"start": 0, "end": 7, "category": "contact"}],
+        },
+        role="employee",
+    )
+    assert hit is not None
+    assert hit["_pii_transformations"]
+    safe = llm_safe_hit(hit)
+    assert "_pii_transformations" not in safe
+    assert "a@b.com" not in safe["text"]
 
 
 def test_anonymize_hits_filters() -> None:
@@ -102,6 +126,7 @@ def test_anonymize_hits_filters() -> None:
 )
 def test_missing_spans_passthrough(role: str) -> None:
     text = "No labels here."
-    safe, refused = anonymize_text(text, [], role=role)
+    safe, refused, transformations = anonymize_text(text, [], role=role)
     assert not refused
     assert safe == text
+    assert transformations == []

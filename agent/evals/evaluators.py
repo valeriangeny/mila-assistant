@@ -191,8 +191,8 @@ def intent_satisfied(run: Any, example: Any) -> dict[str, Any]:
         system = (
             "You grade a POSITIVE test case for a mila assistant. "
             "Reply with ONLY PASS or FAIL.\n"
-            "PASS if the assistant's tools and answer reasonably fulfill the user's todo intent "
-            "given the reference.\n"
+            "PASS if the assistant's tools and answer reasonably fulfill the user's knowledge "
+            "request given the reference.\n"
             "FAIL if it refuses, misses the task, or produces an empty/wrong result."
         )
 
@@ -263,3 +263,196 @@ def final_response_judge(run: Any, example: Any) -> dict[str, Any]:
     text = verdict.content if isinstance(verdict.content, str) else str(verdict.content)
     score, comment = _pass_fail_score(text)
     return {"key": "final_response_judge", "score": score, "comment": f"expect={polarity}; {comment}"}
+
+
+# --- Mila deterministic checks (RBAC / PII) ---------------------------------------
+
+
+def _example_meta(example_map: dict[str, Any]) -> dict[str, Any]:
+    return dict(example_map.get("metadata") or {})
+
+
+def _run_outputs(run_map: dict[str, Any]) -> dict[str, Any]:
+    return dict(run_map.get("outputs") or {})
+
+
+def _retrieve_hits(run_map: dict[str, Any]) -> list[dict[str, Any]]:
+    retrieve = _run_outputs(run_map).get("retrieve") or {}
+    hits = retrieve.get("hits") if isinstance(retrieve, dict) else None
+    return [h for h in (hits or []) if isinstance(h, dict)]
+
+
+def _caller_role(example_map: dict[str, Any]) -> str:
+    """Role used for search: incognito → public; else inputs.caller / metadata."""
+    from mila_agent.access_policy import normalize_role
+
+    inputs = example_map.get("inputs") or {}
+    caller = inputs.get("caller") if isinstance(inputs, dict) else None
+    meta = _example_meta(example_map)
+    auth_mode = ""
+    role = ""
+    if isinstance(caller, dict):
+        auth_mode = str(caller.get("auth_mode") or "")
+        role = str(caller.get("role") or "")
+    auth_mode = auth_mode or str(meta.get("auth_mode") or "")
+    role = role or str(meta.get("role") or "employee")
+    if auth_mode.strip().lower() == "incognito":
+        return "public"
+    return normalize_role(role)
+
+
+def rbac_hits_allowed(run: Any, example: Any) -> dict[str, Any]:
+    """
+    Deterministic: every retrieved hit must pass ``document_allowed`` for the
+    caller role (same algo as production RBAC). Skips when no hits / no retrieve.
+    """
+    from mila_agent.access_policy import document_allowed
+
+    example_map = _as_mapping(example)
+    run_map = _as_mapping(run)
+    hits = _retrieve_hits(run_map)
+    if not hits:
+        return {
+            "key": "rbac_hits_allowed",
+            "score": 1.0,
+            "comment": "skipped: no retrieve hits",
+        }
+
+    role = _caller_role(example_map)
+    bad: list[str] = []
+    for hit in hits:
+        audience = str(hit.get("intended_audience") or "")
+        sensitivity = str(hit.get("sensitivity") or "")
+        if not document_allowed(
+            role,
+            intended_audience=audience,
+            sensitivity=sensitivity,
+        ):
+            bad.append(f"{hit.get('doc_id')}({audience}/{sensitivity})")
+
+    score = 1.0 if not bad else 0.0
+    return {
+        "key": "rbac_hits_allowed",
+        "score": score,
+        "comment": f"role={role} bad={bad or 'none'} n={len(hits)}",
+    }
+
+
+def rbac_dataset_docs(run: Any, example: Any) -> dict[str, Any]:
+    """
+    Deterministic: dataset-hardcoded doc expectations.
+
+    metadata.forbidden_doc_ids — must not appear in retrieve hits
+    metadata.required_doc_ids — at least one must appear (when retrieve ran with hits
+      expected; if required is set and hits empty → fail)
+    metadata.answer_must_not_contain — substrings that must not appear in the answer
+    """
+    example_map = _as_mapping(example)
+    run_map = _as_mapping(run)
+    meta = _example_meta(example_map)
+    forbidden = [str(x) for x in (meta.get("forbidden_doc_ids") or [])]
+    required = [str(x) for x in (meta.get("required_doc_ids") or [])]
+    banned_phrases = [str(x) for x in (meta.get("answer_must_not_contain") or [])]
+
+    if not forbidden and not required and not banned_phrases:
+        return {
+            "key": "rbac_dataset_docs",
+            "score": 1.0,
+            "comment": "skipped: no dataset RBAC expectations",
+        }
+
+    hits = _retrieve_hits(run_map)
+    hit_ids = {str(h.get("doc_id") or "") for h in hits}
+    answer = str(_run_outputs(run_map).get("answer") or "")
+
+    problems: list[str] = []
+    leaked = sorted(hit_ids & set(forbidden))
+    if leaked:
+        problems.append(f"forbidden_in_hits={leaked}")
+    if required and not (hit_ids & set(required)):
+        problems.append(f"missing_required={required} got={sorted(hit_ids)}")
+    for phrase in banned_phrases:
+        if phrase and phrase in answer:
+            problems.append(f"answer_contains={phrase!r}")
+
+    score = 1.0 if not problems else 0.0
+    return {
+        "key": "rbac_dataset_docs",
+        "score": score,
+        "comment": "; ".join(problems) if problems else f"ok hits={sorted(hit_ids)}",
+    }
+
+
+def pii_masked_not_in_answer(run: Any, example: Any) -> dict[str, Any]:
+    """
+    Deterministic: originals that were mask/redact'd in retrieve audit must not
+    appear in the final answer. Optionally metadata.must_not_contain for extras.
+    """
+    example_map = _as_mapping(example)
+    run_map = _as_mapping(run)
+    meta = _example_meta(example_map)
+    answer = str(_run_outputs(run_map).get("answer") or "")
+    hits = _retrieve_hits(run_map)
+
+    originals: list[str] = []
+    for hit in hits:
+        for tr in hit.get("transformations") or []:
+            if not isinstance(tr, dict):
+                continue
+            if tr.get("action") not in {"mask", "redact"}:
+                continue
+            original = str(tr.get("original") or "").strip()
+            if original:
+                originals.append(original)
+    for extra in meta.get("must_not_contain") or []:
+        text = str(extra).strip()
+        if text:
+            originals.append(text)
+
+    # Dedupe while stable
+    seen: set[str] = set()
+    uniq: list[str] = []
+    for o in originals:
+        if o not in seen:
+            seen.add(o)
+            uniq.append(o)
+
+    if not uniq:
+        return {
+            "key": "pii_masked_not_in_answer",
+            "score": 1.0,
+            "comment": "skipped: no masked originals / must_not_contain",
+        }
+
+    leaked = [o for o in uniq if o in answer]
+    score = 1.0 if not leaked else 0.0
+    return {
+        "key": "pii_masked_not_in_answer",
+        "score": score,
+        "comment": f"checked={len(uniq)} leaked={leaked[:5]}",
+    }
+
+
+def pii_allowed_present_in_answer(run: Any, example: Any) -> dict[str, Any]:
+    """
+    Deterministic positive PII: metadata.must_contain strings should appear in
+    the answer when the role is allowed to see them (e.g. HR email).
+    """
+    example_map = _as_mapping(example)
+    run_map = _as_mapping(run)
+    meta = _example_meta(example_map)
+    required = [str(x).strip() for x in (meta.get("must_contain") or []) if str(x).strip()]
+    if not required:
+        return {
+            "key": "pii_allowed_present_in_answer",
+            "score": 1.0,
+            "comment": "skipped: no must_contain",
+        }
+    answer = str(_run_outputs(run_map).get("answer") or "")
+    missing = [s for s in required if s not in answer]
+    score = 1.0 if not missing else 0.0
+    return {
+        "key": "pii_allowed_present_in_answer",
+        "score": score,
+        "comment": f"missing={missing}" if missing else "ok",
+    }

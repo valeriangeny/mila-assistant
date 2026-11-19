@@ -6,7 +6,7 @@ Permission-aware internal knowledge assistant for the hypothetical **aliM AI Ins
 
 | Path | Role |
 | --- | --- |
-| [`docs/`](docs/) | Design notes: [architecture](docs/architecture.md), [OAuth + RBAC](docs/oauth-rbac.md), [PII](docs/pii.md) |
+| [`docs/`](docs/) | Design notes: [architecture](docs/architecture.md), [OAuth + RBAC](docs/oauth-rbac.md), [PII](docs/pii.md), [evals](docs/evals.md) |
 | [`instructions/`](instructions/) | Assignment brief + corpus |
 | [`agent/`](agent/) | LangGraph + Gemini agent (`mila_agent`) |
 | [`copilot/`](copilot/) | Next.js + CopilotKit chat UI |

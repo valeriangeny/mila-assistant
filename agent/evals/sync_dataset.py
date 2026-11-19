@@ -1,10 +1,10 @@
 """Sync local evals/datasets/{name}/examples.json ↔ LangSmith dataset of the same name.
 
   # Local overwrites remote
-  uv run python evals/sync_dataset.py --name mila-agent-v1 --push
+  uv run python evals/sync_dataset.py --name mila-smoke-v1 --push --yes
 
   # Remote overwrites local
-  uv run python evals/sync_dataset.py --name mila-agent-v1 --pull
+  uv run python evals/sync_dataset.py --name mila-smoke-v1 --pull --yes
 """
 
 from __future__ import annotations

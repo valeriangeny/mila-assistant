@@ -9,12 +9,23 @@ from typing import Any
 
 from dotenv import load_dotenv
 from langsmith import Client
+from langsmith.schemas import DataType
 
 EVALS_DIR = Path(__file__).resolve().parent
 DATASETS_DIR = EVALS_DIR / "datasets"
-DEFAULT_DATASET = "mila-agent-v1"
+DEFAULT_DATASET = "mila-smoke-v1"
+
+# Known LangSmith datasets under evals/datasets/{name}/.
+DATASET_CATALOG = {
+    "mila-smoke-v1": "Auth gates + basic happy-path retrieve (public/incognito).",
+    "mila-roles-v1": "Logged-in RBAC: allow vs reject by role × document.",
+    "mila-pii-v1": "Role-based PII mask / redact / refuse on retrieved text.",
+    "mila-safety-v1": "Malicious / out-of-guideline prompts (injection, code exec, hate, violence).",
+    "mila-adversarial-v1": "Future: corpus prompt-injection after --include-adversarial ingest.",
+}
 
 # LangGraph Studio / chat experiments expect inputs.messages (not inputs.question).
+# Optional inputs.caller injects AgentContext for evals (LangSmith target only sees inputs).
 INPUTS_SCHEMA = {
     "type": "object",
     "properties": {
@@ -28,7 +39,17 @@ INPUTS_SCHEMA = {
                 },
                 "required": ["role", "content"],
             },
-        }
+        },
+        "caller": {
+            "type": "object",
+            "properties": {
+                "auth_mode": {"type": "string"},
+                "authenticated": {"type": "boolean"},
+                "role": {"type": "string"},
+                "mila_user_id": {"type": "string"},
+                "mila_user_name": {"type": "string"},
+            },
+        },
     },
     "required": ["messages"],
 }
@@ -64,6 +85,49 @@ def question_from_inputs(inputs: dict[str, Any]) -> str:
     if isinstance(question, str) and question.strip():
         return question
     raise ValueError("Example inputs need messages[].content or question")
+
+
+_CALLER_KEYS = ("auth_mode", "authenticated", "role", "mila_user_id", "mila_user_name")
+
+
+def caller_dict_from_row(
+    inputs: dict[str, Any] | None = None,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Build inputs.caller from explicit caller, top-level input keys, or metadata."""
+    inputs = inputs or {}
+    metadata = metadata or {}
+    explicit = inputs.get("caller")
+    if isinstance(explicit, dict) and explicit:
+        return {k: explicit[k] for k in _CALLER_KEYS if k in explicit}
+
+    caller: dict[str, Any] = {}
+    for key in _CALLER_KEYS:
+        if key in inputs and key != "caller":
+            caller[key] = inputs[key]
+        elif key in metadata:
+            caller[key] = metadata[key]
+    return caller
+
+
+def context_from_inputs(inputs: dict[str, Any]):
+    """Map example inputs.caller → AgentContext (evals; no OIDC)."""
+    from mila_agent.context import AgentContext
+
+    caller = caller_dict_from_row(inputs)
+    if not caller:
+        return AgentContext()
+    auth_mode = str(caller.get("auth_mode") or "unauthenticated")
+    authenticated = bool(caller.get("authenticated"))
+    if auth_mode == "authenticated":
+        authenticated = True
+    return AgentContext(
+        auth_mode=auth_mode,  # type: ignore[arg-type]
+        authenticated=authenticated,
+        role=str(caller.get("role") or "employee"),
+        mila_user_id=str(caller.get("mila_user_id") or ""),
+        mila_user_name=str(caller.get("mila_user_name") or ""),
+    )
 
 
 def normalize_inputs(inputs: dict[str, Any]) -> dict[str, Any]:
@@ -115,8 +179,16 @@ def _row_to_example(row: dict[str, Any]) -> dict[str, Any]:
     metadata = dict(row.get("metadata") or {})
     if local_id and "local_id" not in metadata:
         metadata["local_id"] = local_id
+    inputs = normalize_inputs(dict(row.get("inputs") or {}))
+    # LangSmith target only receives inputs — promote persona from metadata if needed.
+    caller = caller_dict_from_row(inputs, metadata)
+    if caller and "caller" not in inputs:
+        inputs = {**inputs, "caller": caller}
+    for key in _CALLER_KEYS:
+        if key in caller and key not in metadata:
+            metadata[key] = caller[key]
     return {
-        "inputs": normalize_inputs(dict(row.get("inputs") or {})),
+        "inputs": inputs,
         "outputs": row.get("outputs") or {},
         "metadata": metadata,
     }
@@ -126,10 +198,11 @@ def ensure_remote_dataset(client: Client, name: str, description: str | None = N
     existing = {d.name: d for d in client.list_datasets(dataset_name=name)}
     if name in existing:
         return existing[name]
+    desc = description or DATASET_CATALOG.get(name) or f"Mila agent eval dataset ({name})"
     return client.create_dataset(
         dataset_name=name,
-        description=description or f"Mila agent eval dataset ({name})",
-        data_type="kv",
+        description=desc,
+        data_type=DataType.kv,
         inputs_schema=INPUTS_SCHEMA,
         outputs_schema=OUTPUTS_SCHEMA,
     )
