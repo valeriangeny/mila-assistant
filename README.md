@@ -24,14 +24,14 @@ cp config/.env.example config/.env.local
 uv run langgraph dev          # :2024, graph mila_agent
 
 # other terminal (repo root)
-yarn install && yarn dev:copilot   # :3001
+yarn install && yarn dev:copilot   # :4000
 ```
 
 | Service | URL |
 | --- | --- |
 | Qdrant | http://127.0.0.1:6333 |
 | Agent Server | http://127.0.0.1:2024 |
-| Copilot | http://127.0.0.1:3001 |
+| Copilot | http://127.0.0.1:4000 |
 
 ## Vector DB (Qdrant) + local embeddings
 

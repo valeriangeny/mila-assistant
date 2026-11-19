@@ -1,0 +1,61 @@
+{
+  "interactiveLogin": true,
+  "httpServer": "NettyWrapper",
+  "loginPagePath": "/app/login/login.html",
+  "tokenCallbacks": [
+    {
+      "issuerId": "default",
+      "tokenExpiry": 3600,
+      "requestMappings": [
+        {
+          "requestParam": "subject",
+          "match": "alice",
+          "claims": {
+            "sub": "u_alice",
+            "email": "alice.chen@alim.example",
+            "name": "Alice Chen",
+            "role": "employee",
+            "title": "Senior Research Engineer",
+            "preferred_username": "alice"
+          }
+        },
+        {
+          "requestParam": "subject",
+          "match": "priya",
+          "claims": {
+            "sub": "u_priya",
+            "email": "priya.shah@alim.example",
+            "name": "Priya Shah",
+            "role": "hr",
+            "title": "VP, People Operations",
+            "preferred_username": "priya"
+          }
+        },
+        {
+          "requestParam": "subject",
+          "match": "marcus",
+          "claims": {
+            "sub": "u_marcus",
+            "email": "marcus.liu@alim.example",
+            "name": "Marcus Liu",
+            "role": "engineering",
+            "title": "Chief Technology Officer",
+            "preferred_username": "marcus"
+          }
+        },
+        {
+          "requestParam": "subject",
+          "match": "dana",
+          "claims": {
+            "sub": "u_dana",
+            "email": "dana.okafor@alim.example",
+            "name": "Dana Okafor",
+            "role": "security",
+            "title": "Chief Information Security Officer",
+            "preferred_username": "dana"
+          }
+        }
+      ]
+    }
+  ]
+}

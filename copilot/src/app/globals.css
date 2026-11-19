@@ -1,11 +1,62 @@
-* {
-  box-sizing: border-box;
+:root {
+  --mila-userbar-height: 64px;
 }
 
-html,
-body {
-  margin: 0;
-  min-height: 100%;
-  background: #f6f7f9;
-  color: #111;
+.mila-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.mila-main {
+  padding: 2rem 1.25rem;
+  max-width: 40rem;
+}
+
+/*
+ * CopilotSidebar's window is position:fixed with min-height:100%, which covers
+ * the sticky AppBar. Pin chat below the user bar instead.
+ */
+.mila-shell .copilotKitSidebar {
+  z-index: 20;
+}
+
+/* Custom chat header: title + thread id, New thread control */
+.mila-shell .mila-chat-header {
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.mila-shell .mila-chat-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+/* Inspector floats over the right edge and blocks Sign in in e2e/local demos. */
+.mila-shell cpk-web-inspector {
+  top: var(--mila-userbar-height) !important;
+}
+
+@media (min-width: 640px) {
+  .mila-shell :where(.copilotKitSidebar) .copilotKitWindow,
+  .mila-shell :where(.copilotKitSidebar) .copilotKitWindow.open {
+    top: var(--mila-userbar-height) !important;
+    bottom: 0 !important;
+    height: calc(100vh - var(--mila-userbar-height)) !important;
+    height: calc(100dvh - var(--mila-userbar-height)) !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+}
+
+/* Mobile: full-screen chat still leaves the sticky bar usable above when closed;
+   when open, keep a top inset so Sign in stays reachable. */
+@media (max-width: 639px) {
+  .mila-shell :where(.copilotKitSidebar) .copilotKitWindow.open {
+    top: var(--mila-userbar-height) !important;
+    height: calc(100dvh - var(--mila-userbar-height)) !important;
+  }
 }

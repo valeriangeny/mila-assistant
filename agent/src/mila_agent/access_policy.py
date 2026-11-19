@@ -28,9 +28,8 @@ Unknown roles get the least privilege (same as ``employee``).
 
 ## Trust boundary
 
-Callers must pass a **verified** role. The retrieve tool currently accepts
-``role`` from the model; treat that as a prototype seam. Prefer injecting the
-authenticated user role from the request context when auth lands.
+Callers must pass a **verified** role. ``retrieve_knowledge`` reads it from
+LangGraph ``AgentContext`` / auth (CopilotKit mock OIDC), not from the model.
 """
 
 from __future__ import annotations
