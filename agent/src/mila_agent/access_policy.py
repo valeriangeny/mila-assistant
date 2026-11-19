@@ -18,7 +18,10 @@ A document is allowed iff::
     doc.intended_audience ∈ role.audiences
     AND doc.sensitivity ∈ role.sensitivities
 
-Unknown roles get the least privilege (same as ``employee``).
+Unknown *role strings* fall back to ``employee``. Incognito browsing uses the
+explicit ``public`` role (stricter than employee: company-wide + ``public``
+sensitivity only). Unauthenticated callers must not search at all — that gate
+lives in ``retrieve_knowledge`` via ``auth_mode``.
 
 ## How to modify
 
@@ -28,8 +31,9 @@ Unknown roles get the least privilege (same as ``employee``).
 
 ## Trust boundary
 
-Callers must pass a **verified** role. ``retrieve_knowledge`` reads it from
-LangGraph ``AgentContext`` / auth (CopilotKit mock OIDC), not from the model.
+Callers must pass a **verified** role (or opt into ``public`` via incognito).
+``retrieve_knowledge`` reads ``auth_mode`` + role from LangGraph
+``AgentContext`` / auth (CopilotKit mock OIDC), not from the model.
 """
 
 from __future__ import annotations
@@ -89,6 +93,8 @@ class AccessScope:
 # --- Policy table (edit here) -----------------------------------------------------
 #
 # Design notes (defendable defaults for the take-home):
+# - public: incognito / guest — company-wide + sensitivity public only (stricter
+#   than employee; no internal).
 # - employee: company-wide public/internal only.
 # - hr: people-ops (+ shared with security) and function-leads; all sensitivities
 #   (HR owns restricted profiles / leave / comp).
@@ -96,9 +102,14 @@ class AccessScope:
 #   up through confidential (restricted security/HR stays out).
 # - security: security (+ both shared) and function-leads; all sensitivities.
 #
-# company-wide is included for every role so general policies remain visible.
+# company-wide is included for staff roles so general policies remain visible.
 
 ROLE_ACCESS: Mapping[str, AccessScope] = {
+    "public": AccessScope(
+        role="public",
+        audiences=frozenset({"company-wide"}),
+        sensitivities=frozenset({"public"}),
+    ),
     "employee": AccessScope(
         role="employee",
         audiences=_EMPLOYEE_AUDIENCES,

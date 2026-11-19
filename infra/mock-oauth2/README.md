@@ -37,7 +37,9 @@ Edit `config.json` to change claims; edit `login.html` for the picker UI. Restar
 3. Pick a persona on the mock IdP page → redirect back with session cookie
 4. CopilotKit sends `role` / `mila_user_id` as LangGraph context for retrieve filters
 
-In-chat demo tools: `prompt_sign_in` (anonymous) and `prompt_switch_user` (signed in).
+In-chat demo tools: `prompt_sign_in` (unauthenticated / incognito) and
+`prompt_switch_user` (authenticated). Dismiss → `auth_mode=incognito` + role
+`public`. Playwright: `e2e/tests/auth-*.spec.ts`.
 
 Interactive login sets JWT `sub` to the username (`alice`, …). CoAgent maps that
 to `instructions/users.json` personas (role, email, display name) after JWKS
