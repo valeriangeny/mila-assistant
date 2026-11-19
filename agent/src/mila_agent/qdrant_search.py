@@ -10,6 +10,7 @@ from fastembed import TextEmbedding
 from qdrant_client import QdrantClient
 
 from mila_agent.access_policy import normalize_role, qdrant_filter_for_role
+from mila_agent.pii_policy import anonymize_hits
 
 DEFAULT_COLLECTION = "mila_docs"
 EMBEDDING_DIM = 384
@@ -104,10 +105,10 @@ def search_knowledge(
             with_payload=True,
         )
 
-    hits: list[dict[str, Any]] = []
+    raw_hits: list[dict[str, Any]] = []
     for point in points:
         payload = dict(point.payload or {})
-        hits.append(
+        raw_hits.append(
             {
                 "score": float(point.score) if point.score is not None else None,
                 "doc_id": payload.get("doc_id"),
@@ -118,15 +119,34 @@ def search_knowledge(
                 "doc_type": payload.get("doc_type"),
                 "chunk_index": payload.get("chunk_index"),
                 "pii_categories": payload.get("pii_categories") or [],
+                "pii_spans": payload.get("pii_spans") or [],
                 "text": payload.get("text") or "",
             }
         )
 
+    # Doc RBAC already applied via Qdrant filter; anonymize text before LLM.
+    hits = anonymize_hits(raw_hits, role=verified_role)
+    refused = len(raw_hits) - len(hits)
+
+    if hits:
+        status = "ok"
+        message = None
+    elif raw_hits and refused:
+        status = "empty"
+        message = (
+            "Matching chunks were withheld under the caller's PII policy "
+            "(sensitive narrative / refuse)."
+        )
+    else:
+        status = "empty"
+        message = "No matching chunks for this query under current access."
+
     return {
-        "status": "ok" if hits else "empty",
-        "message": None if hits else "No matching chunks for this query under current access.",
+        "status": status,
+        "message": message,
         "query": query,
         "role": verified_role,
         "collection": collection,
         "hits": hits,
+        "pii_refused_hits": refused,
     }

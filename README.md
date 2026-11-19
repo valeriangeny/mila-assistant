@@ -49,6 +49,6 @@ uv run mila-ingest --recreate
 
 Or: `docker compose --profile ingest run --rm ingest`
 
-See [`ingest/README.md`](ingest/README.md). RBAC: [`docs/oauth-rbac.md`](docs/oauth-rbac.md). PII design: [`docs/pii.md`](docs/pii.md).
+See [`ingest/README.md`](ingest/README.md). RBAC: [`docs/oauth-rbac.md`](docs/oauth-rbac.md). PII: [`docs/pii.md`](docs/pii.md) (detect at ingest, anonymize at retrieve).
 
 See [`instructions/Take-Home Assignment.md`](instructions/Take-Home%20Assignment.md).

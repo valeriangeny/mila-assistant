@@ -48,6 +48,10 @@ export function Providers({ children }: { children: ReactNode }) {
     setHasMessages(next);
   }, []);
 
+  const onContinueIncognito = useCallback(() => {
+    setIncognito(true);
+  }, []);
+
   const authMode = deriveAuthMode(user, incognito);
 
   const Header = useMemo(
@@ -81,7 +85,7 @@ export function Providers({ children }: { children: ReactNode }) {
             <ChatAuthDemo
               user={user}
               authMode={authMode}
-              onContinueIncognito={() => setIncognito(true)}
+              onContinueIncognito={onContinueIncognito}
             />
             <CopilotSidebar
               defaultOpen

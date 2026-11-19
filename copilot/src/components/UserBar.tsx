@@ -8,7 +8,7 @@ import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { type AuthMode, type AuthUser, effectiveRole } from '@/lib/auth/mode';
 import { authLoginHref, destroyClientThreadState } from '@/lib/chat/thread';
@@ -37,8 +37,20 @@ function secondaryLine(user: AuthUser | null, authMode: AuthMode): string | null
 
 export function UserBar({ user, authMode, loading, onUserChange }: Props) {
   const [busy, setBusy] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   const role = effectiveRole(user, authMode);
   const detail = secondaryLine(user, authMode);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get('authError');
+    if (!err) return;
+    setAuthError(err);
+    params.delete('authError');
+    const next = `${window.location.pathname}${params.toString() ? `?${params}` : ''}${window.location.hash}`;
+    window.history.replaceState({}, '', next);
+  }, []);
 
   const signIn = useCallback(() => {
     window.location.href = authLoginHref();
@@ -92,6 +104,17 @@ export function UserBar({ user, authMode, loading, onUserChange }: Props) {
             assistant
           </Typography>
         </Stack>
+        {authError ? (
+          <Typography
+            variant="caption"
+            color="error"
+            data-testid="auth-error"
+            title={authError}
+            sx={{ maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          >
+            Sign-in failed: {authError}. Use http://127.0.0.1:4000 and Sign in again (don’t reuse an old IdP tab).
+          </Typography>
+        ) : null}
 
         <Stack
           direction="row"

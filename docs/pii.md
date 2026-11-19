@@ -123,8 +123,10 @@ Compare detector output to `pii_labels.jsonl` document-level categories for prec
 
 ## Status
 
-- **Documented** — this design.
-- **Not implemented yet** — ingest still writes empty `pii_categories`; retrieve returns raw `text` after RBAC.
+- **Implemented** on the agent/ingest path described above.
+- **Ingest:** `mila_ingest.pii_detect` (Presidio + regex + sensitive `doc_type` → whole-chunk `sensitive_narrative`). Set `MILA_SKIP_PII=1` to skip.
+- **Retrieve:** `mila_agent.pii_policy.anonymize_hits` after Qdrant RBAC filter; refused hits are dropped (`pii_refused_hits` in the tool payload).
+- **Policy table:** `agent/src/mila_agent/pii_policy.py` (`_ROLE_PII`).
 
 ## Related
 

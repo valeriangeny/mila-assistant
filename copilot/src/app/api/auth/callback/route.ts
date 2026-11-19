@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-import { OIDC_STATE_COOKIE, appOrigin } from '@/lib/auth/config';
+import { OIDC_STATE_COOKIE, oidcRedirectUri, requestOrigin } from '@/lib/auth/config';
 import { exchangeCode, userFromIdToken } from '@/lib/auth/oidc';
 import {
   SESSION_COOKIE,
@@ -15,6 +15,7 @@ type StateCookie = {
   state: string;
   verifier: string;
   returnTo?: string;
+  redirectUri?: string;
 };
 
 function safeReturnTo(value: string | undefined): string {
@@ -27,6 +28,7 @@ export async function GET(req: Request) {
   const code = url.searchParams.get('code');
   const state = url.searchParams.get('state');
   const err = url.searchParams.get('error');
+  const origin = requestOrigin(req);
 
   const jar = await cookies();
   let stored: StateCookie | null = null;
@@ -41,7 +43,7 @@ export async function GET(req: Request) {
 
   const fail = (message: string) => {
     const res = NextResponse.redirect(
-      `${appOrigin()}/?authError=${encodeURIComponent(message)}`
+      `${origin}/?authError=${encodeURIComponent(message)}`
     );
     res.cookies.set(OIDC_STATE_COOKIE, '', { ...sessionCookieOptions(0), maxAge: 0 });
     return res;
@@ -53,13 +55,22 @@ export async function GET(req: Request) {
   }
   if (stored.state !== state) return fail('state_mismatch');
 
+  const redirectUri =
+    stored.redirectUri || `${origin}/api/auth/callback` || oidcRedirectUri();
+
   try {
-    const tokens = await exchangeCode({ code, verifier: stored.verifier });
+    const tokens = await exchangeCode({
+      code,
+      verifier: stored.verifier,
+      redirectUri
+    });
     if (!tokens.id_token) return fail('missing_id_token');
     const user = await userFromIdToken(tokens.id_token);
     const sealed = sealSession(user, tokens.expires_in || 3600);
 
-    const res = NextResponse.redirect(`${appOrigin()}${safeReturnTo(stored.returnTo)}`);
+    const res = NextResponse.redirect(
+      `${origin}${safeReturnTo(stored.returnTo)}`
+    );
     res.cookies.set(SESSION_COOKIE, sealed, sessionCookieOptions(tokens.expires_in || 3600));
     res.cookies.set(OIDC_STATE_COOKIE, '', { ...sessionCookieOptions(0), maxAge: 0 });
     return res;

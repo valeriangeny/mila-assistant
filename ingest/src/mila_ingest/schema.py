@@ -7,7 +7,7 @@ DEFAULT_COLLECTION = "mila_docs"
 EMBEDDING_DIM = 384
 DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 
-# Payload keys stored on every Qdrant point (ACL + PII hooks for Phase 3).
+# Payload keys stored on every Qdrant point (ACL + PII).
 PAYLOAD_KEYS = (
     "doc_id",
     "title",
@@ -21,4 +21,5 @@ PAYLOAD_KEYS = (
     "chunk_index",
     "text",
     "pii_categories",
+    "pii_spans",
 )
