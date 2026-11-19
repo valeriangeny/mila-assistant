@@ -13,7 +13,7 @@ LangSmith is optional (tracing / evals / Studio). The runner is the **LangGraph 
 | Embeddings | FastEmbed `BAAI/bge-small-en-v1.5` (local, 384-d) |
 | Tools | `retrieve_knowledge(query)` → Qdrant vector search (verified `role` from auth context) |
 | Vector DB | Qdrant (`docker compose up -d qdrant` + `ingest/`) |
-| Evals | LangSmith datasets (optional) |
+| Evals | LangSmith datasets (optional) — see [`docs/evals.md`](../docs/evals.md) |
 
 ## Setup
 
@@ -56,3 +56,25 @@ docker compose up --build
 - Copilot UI: http://127.0.0.1:4000
 
 Populate the index first (`cd ingest && uv run mila-ingest --recreate`) so retrieval returns hits.
+
+## Evals (LangSmith)
+
+Same pipeline as todo-app: local goldens under `evals/datasets/{name}/examples.json`, sync ↔ LangSmith, then `client.evaluate`. Suites: `mila-smoke-v1`, `mila-roles-v1`, `mila-pii-v1`, `mila-safety-v1` (+ empty `mila-adversarial-v1`). Notes: [`docs/evals.md`](../docs/evals.md).
+
+Needs Qdrant ingested (`cd ingest && uv run mila-ingest --recreate`) for smoke/roles/pii; `LANGSMITH_API_KEY` + Gemini in `config/.env.local`.
+
+```bash
+cd agent
+# Sync dataset (same name local ↔ remote; full override)
+uv run python evals/sync_dataset.py --name mila-smoke-v1 --push --yes
+uv run python evals/sync_dataset.py --name mila-smoke-v1 --pull --yes
+
+# Run experiment (optional --sync pushes local first)
+uv run python evals/run_eval.py --name mila-smoke-v1
+uv run python evals/run_eval.py --name mila-smoke-v1 --sync
+
+# Pytest fixture pushes results to LangSmith (skips if env missing)
+MILA_EVAL_DATASET=mila-smoke-v1 uv run pytest -m langsmith
+```
+
+Persona is `inputs.caller` (mock `AgentContext`) — not the mock IdP. Prefer the sync **script** over LangSmith MCP for push/pull (git is source of truth; script does full replace).

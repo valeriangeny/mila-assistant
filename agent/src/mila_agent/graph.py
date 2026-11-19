@@ -157,9 +157,17 @@ def final_assistant_text(messages: list[BaseMessage]) -> str:
     return ""
 
 
-async def run_agent_async(user_text: str, agent=None) -> dict[str, Any]:
+async def run_agent_async(
+    user_text: str,
+    agent=None,
+    *,
+    context: AgentContext | None = None,
+) -> dict[str, Any]:
     graph = agent or build_agent()
-    result = await graph.ainvoke({"messages": [HumanMessage(content=user_text)]})
+    result = await graph.ainvoke(
+        {"messages": [HumanMessage(content=user_text)]},
+        context=context or AgentContext(),
+    )
     messages: list[BaseMessage] = result["messages"]
     return {
         "answer": final_assistant_text(messages),
@@ -168,8 +176,13 @@ async def run_agent_async(user_text: str, agent=None) -> dict[str, Any]:
     }
 
 
-def run_agent(user_text: str, agent=None) -> dict[str, Any]:
+def run_agent(
+    user_text: str,
+    agent=None,
+    *,
+    context: AgentContext | None = None,
+) -> dict[str, Any]:
     """Sync wrapper for LangSmith evals."""
     import asyncio
 
-    return asyncio.run(run_agent_async(user_text, agent=agent))
+    return asyncio.run(run_agent_async(user_text, agent=agent, context=context))

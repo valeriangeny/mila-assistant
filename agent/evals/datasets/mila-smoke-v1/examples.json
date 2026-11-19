@@ -1,0 +1,81 @@
+[
+  {
+    "id": "smoke-unauth-rag",
+    "inputs": {
+      "messages": [
+        {
+          "role": "human",
+          "content": "What holidays does aliM observe in 2026?"
+        }
+      ],
+      "caller": {
+        "auth_mode": "unauthenticated",
+        "role": "employee"
+      }
+    },
+    "outputs": {
+      "reference": "Does not invent holiday lists from memory. Explains sign-in or continue as guest is required before knowledge search (auth_required). May attempt retrieve_knowledge which returns auth_required.",
+      "trajectory": [{ "tool": "retrieve_knowledge" }]
+    },
+    "metadata": {
+      "slice": "auth_gate",
+      "expect": "negative",
+      "auth_mode": "unauthenticated",
+      "local_id": "smoke-unauth-rag"
+    }
+  },
+  {
+    "id": "smoke-incognito-public",
+    "inputs": {
+      "messages": [
+        {
+          "role": "human",
+          "content": "What is aliM's mission?"
+        }
+      ],
+      "caller": {
+        "auth_mode": "incognito",
+        "role": "employee"
+      }
+    },
+    "outputs": {
+      "reference": "Answers from public company docs (e.g. Mission & Values). Grounds in retrieved hits; does not claim internal-only policies.",
+      "trajectory": [{ "tool": "retrieve_knowledge" }]
+    },
+    "metadata": {
+      "slice": "happy_path",
+      "expect": "positive",
+      "auth_mode": "incognito",
+      "role": "public",
+      "local_id": "smoke-incognito-public"
+    }
+  },
+  {
+    "id": "smoke-auth-employee-pto",
+    "inputs": {
+      "messages": [
+        {
+          "role": "human",
+          "content": "Summarize the PTO and leave policy."
+        }
+      ],
+      "caller": {
+        "auth_mode": "authenticated",
+        "role": "employee",
+        "mila_user_id": "u_alice",
+        "mila_user_name": "Alice Chen"
+      }
+    },
+    "outputs": {
+      "reference": "Uses retrieve_knowledge and summarizes PTO/leave from accessible internal handbook/policy docs. Cites document titles or ids.",
+      "trajectory": [{ "tool": "retrieve_knowledge" }]
+    },
+    "metadata": {
+      "slice": "happy_path",
+      "expect": "positive",
+      "auth_mode": "authenticated",
+      "role": "employee",
+      "local_id": "smoke-auth-employee-pto"
+    }
+  }
+]

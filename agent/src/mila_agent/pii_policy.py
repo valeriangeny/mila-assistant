@@ -110,11 +110,12 @@ def anonymize_text(
     spans: list[Any] | None,
     *,
     role: str | None,
-) -> tuple[str, bool]:
+) -> tuple[str, bool, list[dict[str, Any]]]:
     """Apply role policy to ``text`` using stored spans.
 
-    Returns ``(safe_text, refused)``. When ``refused`` is True the caller should
-    drop the hit (a span required ``refuse`` for this role).
+    Returns ``(safe_text, refused, transformations)``. When ``refused`` is True
+    the caller should drop the hit. ``transformations`` lists mask/redact
+    originals for eval audit only — never forward originals to the LLM tool JSON.
     """
     body = text or ""
     normalized: list[dict[str, Any]] = []
@@ -131,20 +132,30 @@ def anonymize_text(
 
     for span in normalized:
         if pii_action_for(role, span["category"]) == "refuse":
-            return "", True
+            return "", True, []
 
     # Apply from the end so earlier offsets stay valid.
     ordered = sorted(normalized, key=lambda s: (s["start"], s["end"]), reverse=True)
     out = body
+    transformations: list[dict[str, Any]] = []
     for span in ordered:
         action = pii_action_for(role, span["category"])
         if action == "allow":
             continue
         start, end = span["start"], span["end"]
+        original = body[start:end]
         if action == "mask":
             replacement = _mask_token(span["category"])
         else:  # redact
             replacement = ""
+        transformations.append(
+            {
+                "category": span["category"],
+                "action": action,
+                "original": original,
+                "replacement": replacement,
+            }
+        )
         out = out[:start] + replacement + out[end:]
 
     # Collapse gaps left by redact; keep single newlines.
@@ -152,12 +163,16 @@ def anonymize_text(
         out = out.replace("  ", " ")
     out = out.strip()
 
-    return out, False
+    return out, False, transformations
 
 
 def anonymize_hit(hit: Mapping[str, Any], *, role: str | None) -> dict[str, Any] | None:
-    """Return a copy of ``hit`` with role-safe ``text``, or ``None`` if refused."""
-    safe, refused = anonymize_text(
+    """Return a copy of ``hit`` with role-safe ``text``, or ``None`` if refused.
+
+    LLM-facing fields only: drops ``pii_spans``. Puts audit under
+    ``_pii_transformations`` (stripped before tool JSON; kept for eval side-channel).
+    """
+    safe, refused, transformations = anonymize_text(
         str(hit.get("text") or ""),
         hit.get("pii_spans") if isinstance(hit.get("pii_spans"), list) else [],
         role=role,
@@ -167,6 +182,8 @@ def anonymize_hit(hit: Mapping[str, Any], *, role: str | None) -> dict[str, Any]
     out = dict(hit)
     out["text"] = safe
     out["pii_applied"] = True
+    out.pop("pii_spans", None)
+    out["_pii_transformations"] = transformations
     return out
 
 
@@ -181,4 +198,11 @@ def anonymize_hits(
         safe = anonymize_hit(hit, role=role)
         if safe is not None:
             out.append(safe)
+    return out
+
+
+def llm_safe_hit(hit: Mapping[str, Any]) -> dict[str, Any]:
+    """Copy hit without audit/original fields for the tool → LLM payload."""
+    out = {k: v for k, v in hit.items() if not str(k).startswith("_")}
+    out.pop("pii_spans", None)
     return out
