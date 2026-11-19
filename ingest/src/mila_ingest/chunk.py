@@ -80,8 +80,9 @@ def docs_to_chunks(docs: list[dict[str, Any]], *, size: int = 900, overlap: int 
                     "created_at": str(doc.get("created_at") or ""),
                     "chunk_index": idx,
                     "text": piece,
-                    # Phase 3: fill via detector; empty list keeps schema stable now.
+                    # Filled by ``mila_ingest.pii_detect.annotate_chunks`` at ingest.
                     "pii_categories": [],
+                    "pii_spans": [],
                 }
             )
     return out

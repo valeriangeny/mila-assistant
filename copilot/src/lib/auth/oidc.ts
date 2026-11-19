@@ -49,12 +49,13 @@ export function createState(): string {
 export async function buildAuthorizeUrl(opts: {
   state: string;
   challenge: string;
+  redirectUri?: string;
 }): Promise<string> {
   const discovery = await fetchDiscovery();
   const url = new URL(discovery.authorization_endpoint);
   url.searchParams.set('client_id', oidcClientId());
   url.searchParams.set('response_type', 'code');
-  url.searchParams.set('redirect_uri', oidcRedirectUri());
+  url.searchParams.set('redirect_uri', opts.redirectUri || oidcRedirectUri());
   url.searchParams.set('scope', 'openid profile email');
   url.searchParams.set('state', opts.state);
   url.searchParams.set('code_challenge', opts.challenge);
@@ -72,12 +73,13 @@ type TokenResponse = {
 export async function exchangeCode(opts: {
   code: string;
   verifier: string;
+  redirectUri?: string;
 }): Promise<TokenResponse> {
   const discovery = await fetchDiscovery();
   const body = new URLSearchParams({
     grant_type: 'authorization_code',
     code: opts.code,
-    redirect_uri: oidcRedirectUri(),
+    redirect_uri: opts.redirectUri || oidcRedirectUri(),
     client_id: oidcClientId(),
     code_verifier: opts.verifier
   });

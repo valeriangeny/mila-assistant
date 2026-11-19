@@ -36,7 +36,9 @@ uv run mila-agent --env .env.local
 ```bash
 cd agent
 uv sync --extra dev
-uv run langgraph dev
+# Prefer --no-reload locally: checkpoint writes under .langgraph_api otherwise
+# thrash the watcher and can desync CopilotKit frontend tools (in-chat auth cards).
+uv run langgraph dev --no-browser --no-reload
 ```
 
 Graph id: `mila_agent`. Studio: `https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024`

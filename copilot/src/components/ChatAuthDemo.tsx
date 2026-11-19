@@ -116,7 +116,9 @@ export function ChatAuthDemo({ user, authMode, onContinueIncognito }: Props) {
     window.location.href = authLoginHref();
   }, []);
 
-  const canPromptSignIn = authMode !== 'authenticated';
+  // CopilotKit expects "enabled" | "disabled" (boolean false does NOT disable).
+  const signInAvailable = authMode !== 'authenticated' ? 'enabled' : 'disabled';
+  const switchAvailable = authMode === 'authenticated' ? 'enabled' : 'disabled';
 
   useFrontendTool(
     {
@@ -132,7 +134,7 @@ export function ChatAuthDemo({ user, authMode, onContinueIncognito }: Props) {
           .optional()
           .describe('Short explanation shown on the card (why sign-in is needed).')
       }),
-      available: canPromptSignIn,
+      available: signInAvailable,
       handler: async ({ reason }) =>
         JSON.stringify({
           status: 'card_shown',
@@ -169,7 +171,9 @@ export function ChatAuthDemo({ user, authMode, onContinueIncognito }: Props) {
         );
       }
     },
-    [canPromptSignIn, dismissedSignIn, goLogin, onContinueIncognito]
+    // Do not depend on dismissedSignIn / render closures — that re-registers the
+    // tool on every card dismiss and can drop it mid-run for the LangGraph agent.
+    [signInAvailable, goLogin, onContinueIncognito]
   );
 
   useFrontendTool(
@@ -182,7 +186,7 @@ export function ChatAuthDemo({ user, authMode, onContinueIncognito }: Props) {
       parameters: z.object({
         reason: z.string().optional().describe('Short explanation shown on the card.')
       }),
-      available: authMode === 'authenticated',
+      available: switchAvailable,
       handler: async ({ reason }) =>
         JSON.stringify({
           status: 'card_shown',
@@ -219,7 +223,7 @@ export function ChatAuthDemo({ user, authMode, onContinueIncognito }: Props) {
         );
       }
     },
-    [authMode, user, dismissedSwitch, switchUser]
+    [switchAvailable, authMode, user, switchUser]
   );
 
   return null;

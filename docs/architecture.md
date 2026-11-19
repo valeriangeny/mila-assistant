@@ -98,9 +98,9 @@ OIDC is a full-page redirect. To keep one conversation:
 ## Data plane (ingest → retrieve)
 
 ```text
-documents.jsonl  →  chunk + FastEmbed  →  Qdrant points
-                                         payload: text, ACL fields, pii_* (planned)
-retrieve_knowledge  →  vector search + role filter  →  hits to LLM
+documents.jsonl  →  chunk + PII detect + FastEmbed  →  Qdrant points
+                                         payload: text, ACL fields, pii_spans, …
+retrieve_knowledge  →  vector search + role filter  →  anonymize by role  →  LLM
 ```
 
 Embeddings: in-process FastEmbed (`BAAI/bge-small-en-v1.5`). Gemini is used only for chat generation.

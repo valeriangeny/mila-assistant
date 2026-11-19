@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 
 from mila_ingest.chunk import docs_to_chunks
 from mila_ingest.embed import embed_texts
+from mila_ingest.pii_detect import annotate_chunks, pii_detection_enabled
 from mila_ingest.store import connect, get_collection, get_qdrant_url, upsert_chunks
 
 
@@ -77,6 +78,14 @@ def main(argv: list[str] | None = None) -> None:
     )
     if not chunks:
         raise SystemExit("No chunks produced")
+
+    if pii_detection_enabled():
+        print("ingest> detecting PII…", flush=True)
+        chunks = annotate_chunks(chunks)
+        tagged = sum(1 for c in chunks if c.get("pii_spans"))
+        print(f"ingest> pii_chunks_with_spans={tagged}/{len(chunks)}", flush=True)
+    else:
+        print("ingest> PII detection skipped (MILA_SKIP_PII)", flush=True)
 
     client = connect()
     collection = get_collection()

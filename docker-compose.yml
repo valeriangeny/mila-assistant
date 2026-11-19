@@ -58,6 +58,8 @@ services:
       QDRANT_URL: http://qdrant:6333
       QDRANT_COLLECTION: mila_docs
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}
+      # Set MILA_SKIP_PII=1 to skip Presidio (faster smoke ingest).
+      MILA_SKIP_PII: ${MILA_SKIP_PII:-}
     depends_on:
       qdrant:
         condition: service_healthy

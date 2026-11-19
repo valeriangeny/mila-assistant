@@ -10,7 +10,7 @@ export function oidcClientId(): string {
   return process.env.OIDC_CLIENT_ID?.trim() || 'mila-copilot';
 }
 
-/** Public origin of this Next app (used for redirect_uri). */
+/** Configured public origin (fallback when the request host is unavailable). */
 export function appOrigin(): string {
   return (
     process.env.APP_ORIGIN?.trim() ||
@@ -21,6 +21,25 @@ export function appOrigin(): string {
 
 export function oidcRedirectUri(): string {
   return `${appOrigin()}/api/auth/callback`;
+}
+
+/**
+ * Origin the browser used for this request (Honors Host / X-Forwarded-*).
+ * Prefer this for OIDC redirect_uri + post-login redirects so cookies set on
+ * `localhost` are not lost when the callback hits `127.0.0.1` (or vice versa).
+ */
+export function requestOrigin(req: Request): string {
+  const url = new URL(req.url);
+  const proto =
+    req.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() ||
+    url.protocol.replace(/:$/, '') ||
+    'http';
+  const host =
+    req.headers.get('x-forwarded-host')?.split(',')[0]?.trim() ||
+    req.headers.get('host')?.trim() ||
+    url.host;
+  if (!host) return appOrigin();
+  return `${proto}://${host}`.replace(/\/$/, '');
 }
 
 export function authSecret(): string {

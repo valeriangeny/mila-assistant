@@ -95,23 +95,23 @@
         that user’s <code>role</code> claim.
       </p>
       <form id="login" method="post" class="personas">
-        <input type="hidden" name="username" id="username" value="" />
-        <!-- password is unused by mock-oauth2-server matching; kept for form compatibility -->
+        <!-- password unused by mock-oauth2-server; kept for form compatibility -->
         <input type="hidden" name="password" value="" />
 
-        <button class="persona" type="submit" data-user="alice">
+        <!-- name=username value=… submits the subject without JS -->
+        <button class="persona" type="submit" name="username" value="alice">
           <strong>Alice Chen</strong>
           <span>alice · employee · Senior Research Engineer</span>
         </button>
-        <button class="persona" type="submit" data-user="priya">
+        <button class="persona" type="submit" name="username" value="priya">
           <strong>Priya Shah</strong>
           <span>priya · hr · VP, People Operations</span>
         </button>
-        <button class="persona" type="submit" data-user="marcus">
+        <button class="persona" type="submit" name="username" value="marcus">
           <strong>Marcus Liu</strong>
           <span>marcus · engineering · CTO</span>
         </button>
-        <button class="persona" type="submit" data-user="dana">
+        <button class="persona" type="submit" name="username" value="dana">
           <strong>Dana Okafor</strong>
           <span>dana · security · CISO</span>
         </button>
@@ -121,12 +121,5 @@
         <code>dana</code>
       </div>
     </main>
-    <script>
-      document.querySelectorAll("button.persona").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          document.getElementById("username").value = btn.dataset.user;
-        });
-      });
-    </script>
   </body>
 </html>
