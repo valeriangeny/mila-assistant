@@ -6,10 +6,14 @@ Permission-aware internal knowledge assistant for the hypothetical **aliM AI Ins
 
 | Path | Role |
 | --- | --- |
+| [`docs/`](docs/) | Design notes: [architecture](docs/architecture.md), [OAuth + RBAC](docs/oauth-rbac.md), [PII](docs/pii.md) |
 | [`instructions/`](instructions/) | Assignment brief + corpus |
 | [`agent/`](agent/) | LangGraph + Gemini agent (`mila_agent`) |
 | [`copilot/`](copilot/) | Next.js + CopilotKit chat UI |
-| [`infra/`](infra/) | Terraform (parked; previous stack) |
+| [`ingest/`](ingest/) | Corpus → Qdrant |
+| [`infra/`](infra/) | Mock OIDC + parked Terraform |
+
+See [`docs/README.md`](docs/README.md) for the design index.
 
 ## Phase 1 stack
 
@@ -45,6 +49,6 @@ uv run mila-ingest --recreate
 
 Or: `docker compose --profile ingest run --rm ingest`
 
-See [`ingest/README.md`](ingest/README.md). Next: RBAC + PII policy.
+See [`ingest/README.md`](ingest/README.md). RBAC: [`docs/oauth-rbac.md`](docs/oauth-rbac.md). PII design: [`docs/pii.md`](docs/pii.md).
 
 See [`instructions/Take-Home Assignment.md`](instructions/Take-Home%20Assignment.md).
