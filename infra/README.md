@@ -52,6 +52,9 @@ terraform -chdir=env apply -var-file=../envs/sandbox.tfvars
 Build / push images (example):
 
 ```bash
+# Note: agent/Dockerfile is the Compose in-memory `langgraph dev` image (local Path B).
+# Cloud Run historically used a licensed langgraph-api base + Redis/Postgres sidecars —
+# regenerate that packaging before deploying agent to GCP.
 docker build -t "$(terraform -chdir=infra/env output -raw agent_image)" ./agent
 docker build -f copilot/Dockerfile -t "$(terraform -chdir=infra/env output -raw copilot_image)" .
 docker push "$(terraform -chdir=infra/env output -raw agent_image)"

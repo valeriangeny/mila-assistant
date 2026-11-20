@@ -11,22 +11,21 @@ How to get Mila Assistant running from a clean clone: prerequisites, **local bui
 | Node **≥ 22** + [Yarn 1](https://classic.yarnpkg.com/) | Copilot UI (local path) |
 | Gemini auth | `GOOGLE_API_KEY` (AI Studio) **or** Vertex (`GOOGLE_CLOUD_PROJECT` + ADC) |
 
-Optional: [LangSmith](https://smith.langchain.com/) API key for tracing/evals. **Full-stack Docker (Path B)** also needs a LangSmith key with LangGraph deploy access — see warning below.
+Optional: [LangSmith](https://smith.langchain.com/) API key for tracing/evals (not required to run the stack).
 
 ## What is dockerized?
 
 | Piece | Dockerized? | How |
 | --- | --- | --- |
 | **Qdrant** | Yes | Official `qdrant/qdrant` image |
-| **Agent** (LangGraph) | Yes | `agent/Dockerfile` → Compose service `agent` |
+| **Agent** (LangGraph) | Yes | `agent/Dockerfile` → `langgraph dev` (in-memory) in Compose |
 | **Copilot** (Next.js) | Yes | `copilot/Dockerfile` → Compose service `copilot` |
 | **Ingest** | Yes (one-shot) | Compose **profile** `ingest` — `uv` image + bind mount; no custom Dockerfile |
 | **Mock OIDC** | Yes (optional) | Compose **profile** `auth` — Navikt image + [`mock-oauth2/`](../mock-oauth2/) config |
-| **Redis** | Yes (Path B agent) | Required by the LangGraph API image (`REDIS_URI`) |
 | **E2E (Playwright)** | No | Runs on the host against local/compose URLs |
 | **Terraform / Cloud Run** | N/A | Packaged for GCP (`infra/`), not local Compose |
 
-Default `docker compose up --build` starts **qdrant + redis + agent + copilot**. Checkpoints use sqlite locally. Ingest and auth are opt-in profiles so empty-index and IdP are explicit steps.
+Default `docker compose up --build` starts **qdrant + agent + copilot**. The agent image runs the same in-memory server as Path A (`langgraph dev`). Ingest and auth are opt-in profiles so empty-index and IdP are explicit steps.
 
 ## Populate Qdrant (required for retrieval)
 
@@ -132,19 +131,14 @@ Production-style Copilot image still uses `copilot/Dockerfile` (Next standalone)
 
 ## Path B — Docker (build + run)
 
-> **Warning — LangSmith license required.**  
-> The Compose `agent` service uses the self-hosted **`langchain/langgraph-api` licensed image**. Without a valid **`LANGSMITH_API_KEY`** (account with LangGraph deploy / Cloud access) or **`LANGGRAPH_CLOUD_LICENSE_KEY`**, the agent container fails license verification and exits. Redis is also required (`REDIS_URI` → Compose `redis` service).  
-> Prefer **Path A** unless you specifically need the full Docker agent image.
-
-Useful when you want image builds close to Cloud Run packaging.
+Full stack via Compose for a clean-clone smoke test. Agent container = `langgraph dev` (in-memory), same runtime as Path A — **no LangSmith deploy license**.
 
 ```bash
-# 1) LLM + LangSmith credentials for Compose (repo root .env is auto-loaded)
+# 1) LLM credentials for Compose (repo root .env is auto-loaded)
 cp agent/config/.env.example .env   # or export in the shell
 # edit: set GOOGLE_API_KEY=…  (or Vertex vars)
-# edit: set LANGSMITH_API_KEY=…  (required for the licensed agent image)
 
-# 2) Build & start Qdrant + redis + agent + copilot
+# 2) Build & start Qdrant + agent + copilot
 docker compose up --build
 
 # 3) Other terminal — load the index
@@ -159,7 +153,6 @@ docker compose --profile auth up -d mock-oauth2-server
 | Copilot UI | http://127.0.0.1:4000 |
 | Agent Server | http://127.0.0.1:2024 |
 | Qdrant | http://127.0.0.1:6333 |
-| Redis | localhost:6379 (Compose internal: `redis:6379`) |
 | Mock OIDC | http://127.0.0.1:8090 (profile `auth`) |
 
 Rebuild after code changes: `docker compose up --build`. Stop: `docker compose down` (add `-v` to wipe the Qdrant volume).
@@ -178,7 +171,7 @@ docker build -f copilot/Dockerfile -t mila-copilot:local .
 | Want | Do |
 | --- | --- |
 | Only vector DB in Docker | `docker compose up -d qdrant` + local agent/UI (**Path A**) |
-| Full stack in Docker | Path B (needs LangSmith license for agent) |
+| Full stack in Docker | Path B |
 | Auth while developing locally | Compose profile `auth` + local agent/UI |
 
 Agent must reach Qdrant at `QDRANT_URL` (`http://127.0.0.1:6333` locally; `http://qdrant:6333` inside Compose).

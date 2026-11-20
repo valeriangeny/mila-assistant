@@ -59,10 +59,10 @@ Graph id: `mila_agent`. Studio: `https://smith.langchain.com/studio/?baseUrl=htt
 
 ## Docker Compose
 
-Prefer local `langgraph dev` for day-to-day work. Full Compose agent uses the **licensed** LangGraph API image and needs a `LANGSMITH_API_KEY` (or `LANGGRAPH_CLOUD_LICENSE_KEY`) plus Redis — see [`docs/install-and-run.md`](../docs/install-and-run.md) Path B warning.
+Prefer local `langgraph dev` for day-to-day work. Compose builds the same in-memory server into `agent/Dockerfile` — see [`docs/install-and-run.md`](../docs/install-and-run.md).
 
 ```bash
-# from repo root (qdrant + redis + agent + copilot)
+# from repo root (qdrant + agent + copilot)
 docker compose up --build
 ```
 

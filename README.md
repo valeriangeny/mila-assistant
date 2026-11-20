@@ -32,8 +32,8 @@ cd agent && uv sync --extra dev && uv run langgraph dev --no-browser --no-reload
 # other terminal:
 yarn install && yarn dev:copilot
 
-# Optional — full stack in Docker (requires LangSmith key with LangGraph deploy access)
-# cp agent/config/.env.example .env  # set GOOGLE_API_KEY + LANGSMITH_API_KEY
+# Optional — full stack in Docker (agent = langgraph dev in-memory)
+# cp agent/config/.env.example .env  # set GOOGLE_API_KEY=
 # docker compose up --build
 ```
 
