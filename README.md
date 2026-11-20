@@ -14,7 +14,6 @@ Permission-aware internal knowledge assistant for the hypothetical **aliM AI Ins
 | [`infra/`](infra/) | Mock OIDC + parked Terraform |
 
 **Install / build / run (local + Docker):** [`docs/install-and-run.md`](docs/install-and-run.md)  
-**UI flow screenshots:** [`docs/screenshots.md`](docs/screenshots.md)  
 Design index: [`docs/README.md`](docs/README.md)
 
 ## Quick start
@@ -43,4 +42,11 @@ yarn install && yarn dev:copilot
 
 Embeddings use **FastEmbed** in-process (`BAAI/bge-small-en-v1.5`) — no embed API key. Gemini is only for the chat LLM.
 
-See [`ingest/README.md`](ingest/README.md). RBAC: [`docs/oauth-rbac.md`](docs/oauth-rbac.md). PII: [`docs/pii.md`](docs/pii.md). Assignment: [`instructions/Take-Home Assignment.md`](instructions/Take-Home%20Assignment.md).
+See [`ingest/README.md`](ingest/README.md). RBAC: [`docs/oauth-rbac.md`](docs/oauth-rbac.md). PII: [`docs/pii.md`](docs/pii.md).
+
+## Screenshots
+
+- [Copilot UI flow](docs/screenshots.md) — start → OAuth → ask → RBAC reject  
+- [LangSmith UI](docs/langsmith.md) — datasets, experiments, traces, monitoring  
+
+Assignment: [`instructions/Take-Home Assignment.md`](instructions/Take-Home%20Assignment.md).
