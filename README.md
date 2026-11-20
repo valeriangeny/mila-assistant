@@ -47,7 +47,7 @@ See [`ingest/README.md`](ingest/README.md). RBAC: [`docs/oauth-rbac.md`](docs/oa
 
 ## Screenshots
 
-- [Copilot UI flow](docs/screenshots.md) — start → OAuth → ask → RBAC reject  
+- [Copilot UI flow](docs/screenshots.md) — start → in-chat sign-in → OAuth → ask → RBAC reject  
 - [LangSmith UI](docs/langsmith.md) — datasets, experiments, traces, monitoring  
 
 Assignment: [`instructions/Take-Home Assignment.md`](instructions/Take-Home%20Assignment.md).

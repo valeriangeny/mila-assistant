@@ -16,7 +16,7 @@ Design and implementation notes for the take-home prototype. Code lives under `a
 
 | Doc | Covers |
 | --- | --- |
-| [Screenshots](./screenshots.md) | Copilot UI: start → OAuth → ask → RBAC reject |
+| [Screenshots](./screenshots.md) | Copilot UI: start → in-chat sign-in → OAuth → ask → RBAC reject |
 | [LangSmith UI](./langsmith.md) | Evals + observability (datasets, experiments, traces, monitoring) |
 
 Assignment brief and corpus: [`../instructions/`](../instructions/).
