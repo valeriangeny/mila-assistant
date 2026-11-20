@@ -15,6 +15,6 @@ variable "labels" {
 
 variable "secrets" {
   type        = map(string)
-  description = "Map of env var name → secret data (e.g. CORS_ORIGINS, DB_PASSWORD)."
+  description = "Map of env var name → secret data (e.g. LANGSMITH_API_KEY)."
   sensitive   = true
 }

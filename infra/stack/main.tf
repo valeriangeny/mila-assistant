@@ -1,9 +1,8 @@
 # -----------------------------------------------------------------------------
 # main.tf — Project-level stack (once per GCP project)
 #
-# Creates: project APIs, Artifact Registry, WIF + deploy SA, Cloud SQL instance,
-# IAP OAuth client settings (outputs for env HTTPS LBs).
-# Does not create: Cloud Run, logical DB, FE, secrets.
+# Creates: project APIs, Artifact Registry, WIF + deploy SA, IAP OAuth settings.
+# Does not create: Cloud Run, Qdrant, secrets, logical DBs.
 #
 # Apply before any env in this project:
 #   terraform -chdir=stack init -reconfigure -backend-config=backends/nonprod.hcl
@@ -12,7 +11,6 @@
 
 locals {
   enabled_apis = [
-    "sqladmin.googleapis.com",
     "iam.googleapis.com",
     "run.googleapis.com",
     "artifactregistry.googleapis.com",
@@ -20,16 +18,14 @@ locals {
     "sts.googleapis.com",
     "cloudbuild.googleapis.com",
     "secretmanager.googleapis.com",
-    # Agent (LangGraph) behind IAP HTTPS LB + Vertex
+    # Agent (LangGraph) + Copilot behind IAP HTTPS LB + Vertex
     "compute.googleapis.com",
     "iap.googleapis.com",
     "aiplatform.googleapis.com",
   ]
 
-  # AR: mila-nonprod-api. SQL: mila-nonprod-pg. SA: gh-deploy-nonprod.
+  # AR: mila-nonprod-api. SA: gh-deploy-nonprod.
   prefix = "${var.name_prefix}-${var.environment}"
-
-  sql_instance_id = "${var.name_prefix}-${var.environment}-pg"
 
   common_labels = {
     app         = var.name_prefix
@@ -43,19 +39,6 @@ module "project_apis" {
 
   project_id = var.project_id
   apis       = local.enabled_apis
-}
-
-module "sql_instance" {
-  source = "../modules/sql_instance"
-
-  depends_on = [module.project_apis]
-
-  project_id          = var.project_id
-  instance_name       = local.sql_instance_id
-  region              = var.region
-  labels              = local.common_labels
-  deletion_protection = var.environment == "prod"
-  enable_backups      = var.environment == "prod"
 }
 
 module "artifact_registry" {

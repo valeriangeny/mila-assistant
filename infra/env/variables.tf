@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
-# variables.tf — App environment stack (identical for sandbox / staging / prod)
+# variables.tf — App environment (sandbox / staging / prod)
 #
-# Required stack outputs: sql_*, artifact_registry_*, deploy_sa_email, iap_*.
+# Required stack outputs: artifact_registry_*, deploy_sa_email, iap_*.
 # -----------------------------------------------------------------------------
 
 variable "project_id" {
@@ -21,7 +21,7 @@ variable "environment" {
 
 variable "region" {
   type        = string
-  description = "Region for Cloud Run and the FE bucket."
+  description = "Region for Cloud Run."
   default     = "us-central1"
 }
 
@@ -29,16 +29,6 @@ variable "name_prefix" {
   type        = string
   description = "Base name prefix (apps: {prefix}-{env}-…)."
   default     = "mila"
-}
-
-variable "sql_instance_name" {
-  type        = string
-  description = "Cloud SQL instance name from the project stack output."
-}
-
-variable "sql_connection_name" {
-  type        = string
-  description = "Cloud SQL connection name from the project stack output."
 }
 
 variable "artifact_registry_repository_id" {
@@ -77,16 +67,9 @@ variable "iap_members" {
   description = "IAP accessors from the project stack output."
 }
 
-variable "image" {
+variable "qdrant_url" {
   type        = string
-  description = "Full container image URI for the API. Empty = default …/{prefix}-api:latest."
-  default     = ""
-}
-
-variable "mcp_image" {
-  type        = string
-  description = "Full container image URI for the MCP service. Empty = default …/{prefix}-mcp:latest."
-  default     = ""
+  description = "Qdrant HTTP URL for the agent (e.g. https://….qdrant.io:6333 or internal service)."
 }
 
 variable "agent_image" {
@@ -119,10 +102,7 @@ variable "agent_langsmith_api_key" {
 
 variable "secret_env" {
   type        = map(string)
-  description = <<-EOT
-    Extra sensitive env vars (Secret Manager). CORS_ORIGINS and DB_PASSWORD are
-    managed automatically — do not set DB_PASSWORD here.
-  EOT
+  description = "Extra sensitive env vars (Secret Manager), merged with LANGSMITH_API_KEY."
   sensitive   = true
   default     = {}
 }

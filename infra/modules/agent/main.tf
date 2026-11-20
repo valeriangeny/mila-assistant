@@ -2,8 +2,8 @@
 # modules/agent — LangGraph API + CopilotKit copilot behind HTTPS LB + IAP
 #
 # Access: browser Google login via IAP → LB → Cloud Run (not public run.app).
-# Runtime uses Vertex ADC (roles/aiplatform.user) + QDRANT_URL.
-# LangGraph API needs Redis + Postgres — sandbox uses Cloud Run sidecars.
+# Runtime uses Vertex ADC (roles/aiplatform.user) + QDRANT_URL (var.qdrant_url).
+# LangGraph API needs Redis + Postgres — sidecars on the agent service (not Cloud SQL).
 #
 # Copilot (copilot_host + copilot_image): same LB IP + IAP, serves CopilotKit.
 # Browser ↔ copilot only; Next.js runtime → agent run.app with ID token (IAM).
@@ -57,7 +57,7 @@ locals {
   plain_env = {
     APP_ENV               = var.app_env
     ENVIRONMENT           = var.environment
-    QDRANT_URL          = var.mcp_endpoint
+    QDRANT_URL            = var.qdrant_url
     GOOGLE_CLOUD_PROJECT  = var.project_id
     GOOGLE_CLOUD_LOCATION = var.region
     # LangGraph API requires Redis + Postgres (sidecars share localhost).

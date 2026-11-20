@@ -21,7 +21,7 @@ variable "environment" {
 
 variable "region" {
   type        = string
-  description = "Region for Artifact Registry and Cloud SQL."
+  description = "Region for Artifact Registry."
   default     = "us-central1"
 }
 

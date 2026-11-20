@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
-# modules/secrets — Secret Manager secrets + versions (CORS_ORIGINS, secret_env)
-# Accessor IAM is granted by the apis module (needs the runtime SA).
+# modules/secrets — Secret Manager secrets + versions (e.g. LANGSMITH_API_KEY)
+# Accessor IAM is granted by the agent module (runtime SA).
 # -----------------------------------------------------------------------------
 
 resource "google_secret_manager_secret" "app" {
