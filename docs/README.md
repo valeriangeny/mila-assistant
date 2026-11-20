@@ -5,6 +5,7 @@ Design and implementation notes for the take-home prototype. Code lives under `a
 | Doc | Covers |
 | --- | --- |
 | [Install, build, and run](./install-and-run.md) | Prerequisites, local vs Docker, what is containerized, `scripts/setup.sh` |
+| [Screenshots](./screenshots.md) | Auth + RBAC UI flow (start → OAuth → ask → reject) |
 | [Architecture](./architecture.md) | System layout, request flow, frontend shell, thread restore |
 | [OAuth + RBAC](./oauth-rbac.md) | Mock OIDC, session cookie, `auth_mode`, role → document filters |
 | [PII handling](./pii.md) | Detect at ingest, store spans, anonymize before LLM by role |

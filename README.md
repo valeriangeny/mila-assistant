@@ -14,6 +14,7 @@ Permission-aware internal knowledge assistant for the hypothetical **aliM AI Ins
 | [`infra/`](infra/) | Mock OIDC + parked Terraform |
 
 **Install / build / run (local + Docker):** [`docs/install-and-run.md`](docs/install-and-run.md)  
+**UI flow screenshots:** [`docs/screenshots.md`](docs/screenshots.md)  
 Design index: [`docs/README.md`](docs/README.md)
 
 ## Quick start
