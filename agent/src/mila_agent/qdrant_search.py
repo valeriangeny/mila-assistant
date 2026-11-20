@@ -10,6 +10,7 @@ from fastembed import TextEmbedding
 from qdrant_client import QdrantClient
 
 from mila_agent.access_policy import normalize_role, qdrant_filter_for_role
+from mila_agent.guardrails import apply_retrieve_sanitizers
 from mila_agent.pii_policy import anonymize_hits, llm_safe_hit
 from mila_agent.retrieve_audit import set_retrieve_audit
 
@@ -129,6 +130,25 @@ def search_knowledge(
     hits = anonymize_hits(raw_hits, role=verified_role)
     refused = len(raw_hits) - len(hits)
 
+    # Guardrail wrap_tool: neutralize injection scaffolds after PII policy.
+    audit_hits: list[dict[str, Any]] = []
+    for h in hits:
+        safe_text, flags = apply_retrieve_sanitizers(str(h.get("text") or ""))
+        h["text"] = safe_text
+        if flags:
+            h["_guardrail_flags"] = flags
+        audit_hits.append(
+            {
+                "doc_id": h.get("doc_id"),
+                "title": h.get("title"),
+                "sensitivity": h.get("sensitivity"),
+                "intended_audience": h.get("intended_audience"),
+                "text": safe_text,
+                "transformations": list(h.get("_pii_transformations") or []),
+                "guardrail_flags": flags,
+            }
+        )
+
     # Eval side-channel: originals + ACL fields (never sent to the LLM).
     set_retrieve_audit(
         {
@@ -136,17 +156,7 @@ def search_knowledge(
             "role": verified_role,
             "status": "ok" if hits else "empty",
             "pii_refused_hits": refused,
-            "hits": [
-                {
-                    "doc_id": h.get("doc_id"),
-                    "title": h.get("title"),
-                    "sensitivity": h.get("sensitivity"),
-                    "intended_audience": h.get("intended_audience"),
-                    "text": h.get("text") or "",
-                    "transformations": list(h.get("_pii_transformations") or []),
-                }
-                for h in hits
-            ],
+            "hits": audit_hits,
         }
     )
 

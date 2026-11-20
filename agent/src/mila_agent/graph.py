@@ -14,6 +14,7 @@ from langgraph.runtime import get_runtime
 
 from mila_agent.access_policy import normalize_role
 from mila_agent.context import AgentContext, resolve_auth_mode
+from mila_agent.guardrails import make_post_model_hook, make_pre_model_hook
 from mila_agent.retrieve import retrieve_knowledge
 
 
@@ -110,13 +111,22 @@ def _build_llm(model_name: str | None = None) -> ChatGoogleGenerativeAI:
 
 
 def build_agent(model_name: str | None = None):
-    """Build the ReAct agent with the knowledge retrieval tool."""
+    """Build the ReAct agent with the knowledge retrieval tool.
+
+    Guardrails: catalog in ``mila_agent.guardrails``; enable via
+    ``MILA_GUARDRAILS`` (comma-separated). Wired as LangGraph
+    ``pre_model_hook`` / ``post_model_hook``; retrieve sanitizers run inside
+    ``search_knowledge`` (wrap-tool equivalent).
+    """
     llm = _build_llm(model_name)
     return create_react_agent(
         llm,
         [retrieve_knowledge],
         prompt=_dynamic_prompt,
         context_schema=AgentContext,
+        pre_model_hook=make_pre_model_hook(),
+        post_model_hook=make_post_model_hook(),
+        version="v2",
     )
 
 

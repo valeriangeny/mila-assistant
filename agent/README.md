@@ -59,22 +59,15 @@ Populate the index first (`cd ingest && uv run mila-ingest --recreate`) so retri
 
 ## Evals (LangSmith)
 
-Same pipeline as todo-app: local goldens under `evals/datasets/{name}/examples.json`, sync ↔ LangSmith, then `client.evaluate`. Suites: `mila-smoke-v1`, `mila-roles-v1`, `mila-pii-v1`, `mila-safety-v1` (+ empty `mila-adversarial-v1`). Notes: [`docs/evals.md`](../docs/evals.md).
+Local goldens under `evals/datasets/{name}/examples.json`, sync ↔ LangSmith, then `client.evaluate`. Suites: `mila-smoke-v1`, `mila-roles-v1`, `mila-pii-v1`, `mila-safety-v1` (+ empty `mila-adversarial-v1`). See [`docs/evaluation-strategy.md`](../docs/evaluation-strategy.md) and [`docs/evals.md`](../docs/evals.md).
 
 Needs Qdrant ingested (`cd ingest && uv run mila-ingest --recreate`) for smoke/roles/pii; `LANGSMITH_API_KEY` + Gemini in `config/.env.local`.
 
 ```bash
 cd agent
-# Sync dataset (same name local ↔ remote; full override)
 uv run python evals/sync_dataset.py --name mila-smoke-v1 --push --yes
-uv run python evals/sync_dataset.py --name mila-smoke-v1 --pull --yes
-
-# Run experiment (optional --sync pushes local first)
-uv run python evals/run_eval.py --name mila-smoke-v1
 uv run python evals/run_eval.py --name mila-smoke-v1 --sync
-
-# Pytest fixture pushes results to LangSmith (skips if env missing)
 MILA_EVAL_DATASET=mila-smoke-v1 uv run pytest -m langsmith
 ```
 
-Persona is `inputs.caller` (mock `AgentContext`) — not the mock IdP. Prefer the sync **script** over LangSmith MCP for push/pull (git is source of truth; script does full replace).
+Persona is `inputs.caller` (mock `AgentContext`) — not the mock IdP. Use `sync_dataset.py` for push/pull (git is source of truth).
