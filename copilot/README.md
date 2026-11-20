@@ -27,7 +27,7 @@ OIDC_CLIENT_ID=mila-copilot
 APP_ORIGIN=http://127.0.0.1:4000
 ```
 
-Mock IdP (persona picker):
+Mock IdP (persona picker; config in [`mock-oauth2/`](../mock-oauth2/)):
 
 ```bash
 docker compose --profile auth up -d mock-oauth2-server

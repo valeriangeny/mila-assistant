@@ -12,16 +12,6 @@ output "resource_prefix" {
   description = "Name prefix (e.g. mila-nonprod)."
 }
 
-output "cloud_sql_instance_name" {
-  value       = module.sql_instance.instance_name
-  description = "Cloud SQL instance name (for env tfvars)."
-}
-
-output "cloud_sql_connection_name" {
-  value       = module.sql_instance.connection_name
-  description = "Cloud SQL connection name for Cloud Run."
-}
-
 output "artifact_registry_repo" {
   value       = module.artifact_registry.repository_id
   description = "Artifact Registry repository id."

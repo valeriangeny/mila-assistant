@@ -33,9 +33,9 @@ variable "image" {
   description = "Full container image URI for the agent LangGraph API service."
 }
 
-variable "mcp_endpoint" {
+variable "qdrant_url" {
   type        = string
-  description = "QDRANT_URL — Streamable HTTP MCP endpoint."
+  description = "QDRANT_URL for retrieve_knowledge (HTTP endpoint)."
 }
 
 variable "artifact_registry_location" {

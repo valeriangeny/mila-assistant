@@ -65,15 +65,15 @@ services:
         condition: service_healthy
     command: ['uv', 'run', 'mila-ingest', '--recreate']
 
-  # Local mock IdP (OIDC). See infra/mock-oauth2/README.md
+  # Local mock IdP (OIDC). See mock-oauth2/README.md
   mock-oauth2-server:
     profiles: ['auth']
     image: ghcr.io/navikt/mock-oauth2-server:2.1.10
     ports:
       - '8090:8080'
     volumes:
-      - ./infra/mock-oauth2/config.json:/app/config.json:ro
-      - ./infra/mock-oauth2/login.html:/app/login/login.html:ro
+      - ./mock-oauth2/config.json:/app/config.json:ro
+      - ./mock-oauth2/login.html:/app/login/login.html:ro
     environment:
       SERVER_PORT: '8080'
       JSON_CONFIG_PATH: /app/config.json

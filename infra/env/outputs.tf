@@ -12,44 +12,9 @@ output "resource_prefix" {
   description = "Name prefix for env-scoped resources (e.g. mila-sandbox)."
 }
 
-output "cloud_sql_instance_name" {
-  value       = var.sql_instance_name
-  description = "Cloud SQL instance name (from stack)."
-}
-
-output "cloud_sql_connection_name" {
-  value       = var.sql_connection_name
-  description = "Cloud SQL connection name (from stack)."
-}
-
-output "cloud_sql_db_name" {
-  value       = module.sql_database.db_name
-  description = "Logical database name."
-}
-
 output "artifact_registry_repo" {
   value       = var.artifact_registry_repository_id
   description = "Artifact Registry repository id (from stack)."
-}
-
-output "api_image" {
-  value       = local.image
-  description = "API container image URI."
-}
-
-output "api_uri" {
-  value       = module.apis.uri
-  description = "Cloud Run API URL."
-}
-
-output "frontend_bucket" {
-  value       = module.frontends.bucket_name
-  description = "GCS bucket for web/dist."
-}
-
-output "frontend_website_url" {
-  value       = module.frontends.website_url
-  description = "Public object URL for the SPA."
 }
 
 output "secret_ids" {
@@ -62,19 +27,9 @@ output "github_deploy_sa_email" {
   description = "Deploy SA email (from stack)."
 }
 
-output "mcp_uri" {
-  value       = module.mcp.uri
-  description = "Cloud Run MCP service URL."
-}
-
-output "mcp_endpoint" {
-  value       = module.mcp.mcp_endpoint
-  description = "Streamable HTTP MCP endpoint (…/mcp)."
-}
-
-output "mcp_image" {
-  value       = local.mcp_image
-  description = "MCP container image URI."
+output "qdrant_url" {
+  value       = var.qdrant_url
+  description = "Qdrant URL mounted on the agent as QDRANT_URL."
 }
 
 output "agent_image" {
@@ -94,7 +49,7 @@ output "agent_iap_url" {
 
 output "agent_iap_ip" {
   value       = module.agent.iap_ip
-  description = "Global LB IP — point DNS A for agent_iap_host here."
+  description = "Global LB IP — point DNS A for agent_iap_host and copilot_host here."
 }
 
 output "agent_service_name" {

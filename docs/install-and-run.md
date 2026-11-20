@@ -21,7 +21,7 @@ Optional: [LangSmith](https://smith.langchain.com/) API key for tracing/evals; m
 | **Agent** (LangGraph) | Yes | `agent/Dockerfile` → Compose service `agent` |
 | **Copilot** (Next.js) | Yes | `copilot/Dockerfile` → Compose service `copilot` |
 | **Ingest** | Yes (one-shot) | Compose **profile** `ingest` — `uv` image + bind mount; no custom Dockerfile |
-| **Mock OIDC** | Yes (optional) | Compose **profile** `auth` — Navikt mock-oauth2-server |
+| **Mock OIDC** | Yes (optional) | Compose **profile** `auth` — Navikt image + [`mock-oauth2/`](../mock-oauth2/) config |
 | **E2E (Playwright)** | No | Runs on the host against local/compose URLs |
 | **Terraform / Cloud Run** | N/A | Packaged for GCP (`infra/`), not local Compose |
 

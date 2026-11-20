@@ -46,7 +46,7 @@ sequenceDiagram
 
 | Piece | Location |
 | --- | --- |
-| IdP | `infra/mock-oauth2/` — [navikt/mock-oauth2-server](https://github.com/navikt/mock-oauth2-server) |
+| IdP | `mock-oauth2/` — [navikt/mock-oauth2-server](https://github.com/navikt/mock-oauth2-server) |
 | Login / callback / logout / me | `copilot/src/app/api/auth/*` |
 | PKCE + JWKS verify | `copilot/src/lib/auth/oidc.ts` |
 | Session | HMAC-sealed cookie (`copilot/src/lib/auth/session.ts`) |

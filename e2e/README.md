@@ -11,7 +11,7 @@ Three auth flows against the local CoAgent UI + mock IdP.
 ## Prerequisites
 
 ```bash
-# Terminal A — mock IdP
+# Terminal A — mock IdP (config in mock-oauth2/)
 docker compose --profile auth up -d mock-oauth2-server
 
 # Terminal B — Agent Server (chat + RAG flows)

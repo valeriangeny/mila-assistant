@@ -1,6 +1,7 @@
 # Mock OAuth2 / OIDC (local IdP)
 
-[navikt/mock-oauth2-server](https://github.com/navikt/mock-oauth2-server) in Docker — no local Java.
+Repo-root config for local Sign in (not GCP Terraform).  
+[navikt/mock-oauth2-server](https://github.com/navikt/mock-oauth2-server) in Docker — no local Java.  
 Issues tokens for the four sample users in `instructions/users.json` (passwordless persona picker).
 
 ## Start

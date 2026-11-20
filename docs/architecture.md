@@ -11,7 +11,7 @@ Permission-aware RAG chat for aliM AI Institute: Next.js + CopilotKit UI, LangGr
 | Copilot runtime | `copilot/src/app/api/copilotkit` | Bridges browser → LangGraph Agent Server |
 | Agent | `agent/` | ReAct graph (`mila_agent`), tools, RBAC-filtered retrieve |
 | Ingest | `ingest/` | Chunk corpus → FastEmbed → Qdrant payloads |
-| IdP (local) | `infra/mock-oauth2/` | Mock OIDC for four personas |
+| IdP (local) | `mock-oauth2/` | Mock OIDC for four personas |
 | Vector DB | Qdrant | Chunks + ACL metadata (`sensitivity`, `intended_audience`, …) |
 
 ## Request path

@@ -11,7 +11,8 @@ Permission-aware internal knowledge assistant for the hypothetical **aliM AI Ins
 | [`agent/`](agent/) | LangGraph + Gemini agent (`mila_agent`) |
 | [`copilot/`](copilot/) | Next.js + CopilotKit chat UI |
 | [`ingest/`](ingest/) | Corpus → Qdrant |
-| [`infra/`](infra/) | Mock OIDC + parked Terraform |
+| [`mock-oauth2/`](mock-oauth2/) | Local mock OIDC IdP (Compose profile `auth`) |
+| [`infra/`](infra/) | GCP Terraform (agent + copilot / IAP) |
 
 **Install / build / run (local + Docker):** [`docs/install-and-run.md`](docs/install-and-run.md)  
 Design index: [`docs/README.md`](docs/README.md)
