@@ -1,6 +1,8 @@
 # LangSmith eval datasets
 
-Offline experiments for the Mila agent (same harness pattern as the todo-app evals). No dedicated HTTP/auth endpoint — `evals/run_eval.py` calls the graph in-process and injects a mock caller.
+Quick reference for dataset names, example shape, and CLI. Full strategy: **[evaluation-strategy.md](./evaluation-strategy.md)**.
+
+Offline experiments for the Mila agent. No dedicated HTTP/auth endpoint — `evals/run_eval.py` calls the graph in-process and injects a mock caller.
 
 ## Datasets
 
@@ -43,53 +45,53 @@ Local goldens: `agent/evals/datasets/<name>/examples.json`.
 
 | Field | Role |
 | --- | --- |
-| `inputs.messages` | User turn (Studio-compatible) |
-| `inputs.caller` | Mock `AgentContext` — **required for eval persona** (LangSmith `target` only sees inputs) |
+| `inputs.messages` | User turn (Studio-compatible `messages` schema) |
+| `inputs.caller` | Mock `AgentContext` — required for eval persona (`target` only sees inputs) |
 | `outputs.reference` / `trajectory` | Judges + static trajectory check |
 | `metadata.expect` | `positive` \| `negative` polarity for LLM judges |
 | `metadata.slice` | Filter in LangSmith UI (`auth_gate`, `allow`, `mask`, …) |
 
-Personas align with `instructions/users.json`. Sync also copies `caller` fields into metadata for filtering if you only authored one side.
+Personas align with `instructions/users.json`. Sync copies `caller` fields into metadata when needed.
 
-`prompt_sign_in` is a CopilotKit frontend tool — not registered on the eval graph. Smoke unauth cases expect `retrieve_knowledge` → `auth_required`, then a refusal to invent knowledge (not a frontend tool call).
+`prompt_sign_in` is a CopilotKit frontend tool — not on the eval graph. Smoke unauth expects `retrieve_knowledge` → `auth_required`, then a refusal to invent knowledge.
 
 ## Deterministic Mila evaluators
 
 | Key | Source of truth |
 | --- | --- |
-| `rbac_hits_allowed` | `access_policy.document_allowed` on every retrieve hit (algo) |
-| `rbac_dataset_docs` | Dataset metadata: `forbidden_doc_ids`, `required_doc_ids`, `answer_must_not_contain` |
-| `pii_masked_not_in_answer` | Retrieve **audit** originals (mask/redact) + optional `must_not_contain` ∉ answer |
-| `pii_allowed_present_in_answer` | `must_contain` ⊆ answer (e.g. HR email) |
+| `rbac_hits_allowed` | `access_policy.document_allowed` on every retrieve hit |
+| `rbac_dataset_docs` | `forbidden_doc_ids`, `required_doc_ids`, `answer_must_not_contain` |
+| `pii_masked_not_in_answer` | Retrieve audit originals (mask/redact) + `must_not_contain` ∉ answer |
+| `pii_allowed_present_in_answer` | `must_contain` ⊆ answer |
 
-`target()` attaches `outputs.retrieve` from a side-channel (`retrieve_audit`), not from the LLM-visible tool JSON — originals must not be re-injected into the model.
+`target()` attaches `outputs.retrieve` from `retrieve_audit` (not LLM-visible tool JSON).
 
 ## Run
 
 ```bash
-# Index first (roles / pii / smoke happy-path)
 cd ingest && uv run mila-ingest --recreate
 
 cd ../agent
 uv run python evals/sync_dataset.py --name mila-smoke-v1 --push --yes
 uv run python evals/run_eval.py --name mila-smoke-v1 --sync
 
-# Other suites
 uv run python evals/run_eval.py --name mila-roles-v1 --sync
 uv run python evals/run_eval.py --name mila-pii-v1 --sync
 uv run python evals/run_eval.py --name mila-safety-v1 --sync
 ```
 
-Requires `LANGSMITH_API_KEY` and Gemini (`GOOGLE_API_KEY` or Vertex ADC) in `agent/config/.env*`.
+Requires `LANGSMITH_API_KEY` and Gemini in `agent/config/.env*`.
 
 Pytest: `MILA_EVAL_DATASET=mila-smoke-v1 uv run pytest -m langsmith`.
 
 ## Adversarial (later)
 
-Keep `mila-adversarial-v1` empty until ADV docs are ingested. Cases should ask questions that retrieve poisoned bodies and assert the agent does **not** elevate role / dump PII / follow “CEO override” instructions. Separate from `mila-safety-v1` (user-message abuse vs retrieved-doc abuse).
+Keep `mila-adversarial-v1` empty until ADV docs are ingested. Assert no role elevation / email dumps / “CEO override” compliance. Separate from `mila-safety-v1` (user-message abuse vs retrieved-doc abuse).
 
 ## Related
 
+- [Evaluation strategy](./evaluation-strategy.md)
+- [Guardrails](./guardrails.md)
 - [OAuth + RBAC](./oauth-rbac.md)
 - [PII](./pii.md)
 - [Architecture](./architecture.md)
