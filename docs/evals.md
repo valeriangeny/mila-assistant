@@ -1,4 +1,4 @@
-# LangSmith eval datasets
+# Datasets and experimentations (evals)
 
 Quick reference for dataset names, example shape, and CLI. Full strategy: **[evaluation-strategy.md](./evaluation-strategy.md)**.
 
@@ -94,6 +94,7 @@ Pytest: `MILA_EVAL_DATASET=mila-smoke-v1 uv run pytest -m langsmith`.
 
 ## Related
 
+- [LangSmith UI](./langsmith.md) (platform screenshots)
 - [Evaluation strategy](./evaluation-strategy.md)
 - [Guardrails](./guardrails.md)
 - [OAuth + RBAC](./oauth-rbac.md)

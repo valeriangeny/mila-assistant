@@ -14,77 +14,105 @@ Permission-aware RAG chat for aliM AI Institute: Next.js + CopilotKit UI, LangGr
 | IdP (local) | `infra/mock-oauth2/` | Mock OIDC for four personas |
 | Vector DB | Qdrant | Chunks + ACL metadata (`sensitivity`, `intended_audience`, …) |
 
-## High-level diagram
+## Request path
+
+What happens on one ask (optional sign-in first).
 
 ```mermaid
-flowchart TB
-  subgraph browser["Browser"]
-    UB[UserBar / Sign in]
-    CS[CopilotSidebar]
-    LS[(localStorage<br/>threadId + message cache)]
-  end
+sequenceDiagram
+  actor User
+  participant UI as Copilot UI
+  participant Auth as OIDC / session
+  participant Agent as mila_agent
+  participant KB as Qdrant + policy
+  participant LLM as Gemini
 
-  subgraph next["Next.js · copilot :4000"]
-    AuthAPI["/api/auth/*"]
-    CK["/api/copilotkit"]
-    Sess[HMAC session cookie]
-  end
-
-  IdP["Mock OIDC<br/>:8090"]
-
-  subgraph agent["LangGraph Agent Server :2024"]
-    Graph[mila_agent ReAct]
-    Tools[retrieve_knowledge<br/>+ auth demo tools]
-    Policy[access_policy]
-  end
-
-  Q[(Qdrant :6333)]
-  Gemini[Gemini LLM]
-
-  UB --> AuthAPI
-  AuthAPI <--> IdP
-  AuthAPI --> Sess
-  CS --> CK
-  LS -.-> CS
-  CK --> Graph
-  Sess -.->|auth_mode, role via<br/>CopilotKit properties| CK
-  Graph --> Tools
-  Tools --> Policy
-  Policy --> Q
-  Graph <--> Gemini
+  User->>UI: Ask / Sign in
+  UI->>Auth: Login (optional)
+  Auth-->>UI: role, auth_mode
+  User->>UI: Question
+  UI->>Agent: message + caller context
+  Agent->>KB: retrieve_knowledge
+  Note over KB: RBAC filter → PII anonymize
+  KB-->>Agent: allowed hits
+  Agent->>LLM: grounded prompt
+  LLM-->>User: Answer (via UI)
 ```
 
-## Frontend shell
+## Layers
 
-`Providers` (`copilot/src/app/providers.tsx`) owns the composition:
-
-1. **UserBar** — session identity, role, Sign in / Sign out.
-2. **CopilotKit** — `threadId` from `usePersistentThreadId`, `properties` from `agentProperties(user, authMode)`.
-3. **ThreadMessageCache** — mirrors transcript to `localStorage` so OIDC redirects do not wipe history.
-4. **FlushThreadOnLogin** — writes messages immediately before leaving for the IdP.
-5. **ChatAuthDemo** — generative-UI tools: `prompt_sign_in`, `prompt_switch_user`; dismiss → `auth_mode=incognito`.
-6. **CopilotSidebar** — chat surface; welcome label is auth-agnostic and suppressed when cached messages exist.
+Who talks to whom.
 
 ```mermaid
 flowchart LR
-  page[page.tsx] --> providers[Providers]
-  providers --> bar[UserBar]
-  providers --> ck[CopilotKit]
-  ck --> cache[ThreadMessageCache]
-  ck --> flush[FlushThreadOnLogin]
-  ck --> demo[ChatAuthDemo]
-  ck --> side[CopilotSidebar]
+  User --> UI[Copilot UI]
+  UI --> Auth[Mock OIDC + session]
+  UI --> Agent[LangGraph agent]
+  Agent --> LLM[Gemini]
+  Agent --> Retrieve[retrieve_knowledge]
+  Retrieve --> Policy[RBAC + PII]
+  Policy --> Q[(Qdrant)]
+  Ingest[Ingest / FastEmbed] --> Q
+```
+
+## Trust boundaries
+
+Client (Copilot UI) beside App + Agent; mock IdP sits outside and feeds the verified role.
+
+```mermaid
+flowchart TB
+  subgraph Client
+    CopilotUI[Copilot UI]
+    Ask[User asks]
+    SignIn[Sign in]
+  end
+
+  IdP[Mock OIDC IdP]
+
+  subgraph Runtime["App + Agent"]
+    direction LR
+    subgraph App
+      Session[Verified role + auth_mode]
+      CK[CopilotKit BFF]
+    end
+    subgraph Agent
+      Graph[mila_agent + tools]
+    end
+  end
+
+  subgraph Knowledge
+    Search[Vector search]
+    Gate[Allow by role]
+    Mask[Anonymize for role]
+  end
+
+  Model[Gemini]
+
+  Ask --> CopilotUI
+  SignIn --> CopilotUI
+  CopilotUI --> IdP
+  IdP --> Session
+  CopilotUI --> CK
+  Session --> CK
+  CK --> Graph
+  Graph --> Search
+  Search --> Gate --> Mask --> Graph
+  Graph <--> Model
 ```
 
 ## Chat request path
 
-1. User sends a message in the sidebar.
+1. User sends a message in the Copilot UI.
 2. Browser → `POST /api/copilotkit` with agent `mila_agent` and `properties` (`auth_mode`, `role`, `mila_user_id`, …).
 3. CopilotKit Runtime → LangGraph Agent Server (`LANGGRAPH_URL`).
 4. CopilotKit maps matching property keys into LangGraph `AgentContext`.
 5. Model may call `retrieve_knowledge` → Qdrant filter from `access_policy` → grounded reply.
 
 Unauthenticated retrieve returns `status=auth_required` so the agent can call `prompt_sign_in` instead of searching.
+
+## Frontend shell
+
+`Providers` (`copilot/src/app/providers.tsx`) owns the composition: **UserBar**, **CopilotKit** (`threadId` + `properties`), **ThreadMessageCache** / **FlushThreadOnLogin** (OIDC-safe transcript), **ChatAuthDemo** (`prompt_sign_in` / `prompt_switch_user`), **CopilotSidebar**.
 
 ## Thread restore across OIDC
 
