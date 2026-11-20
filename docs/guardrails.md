@@ -90,7 +90,7 @@ Deferred: second safety LLM, vendor moderation APIs, dropping ADV docs at retrie
 ## Evals
 
 - User abuse: `mila-safety-v1`
-- Corpus injection: `mila-adversarial-v1` (after `--include-adversarial`)
+- Corpus injection: `mila-adversarial-v1` (requires `--include-adversarial`)
 
 ## Model
 

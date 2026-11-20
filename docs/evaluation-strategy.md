@@ -54,7 +54,7 @@ One LangSmith dataset per concern.
 | `mila-roles-v1` | Logged-in RBAC allow vs reject | Yes |
 | `mila-pii-v1` | Contact mask vs HR allow; public blocked | Yes |
 | `mila-safety-v1` | Code exec, jailbreak, hate, violence | No |
-| `mila-adversarial-v1` | Retrieved-doc injection (stub until ADV ingest) | Yes + `--include-adversarial` |
+| `mila-adversarial-v1` | Retrieved-doc injection / authority spoof | Yes + `--include-adversarial` |
 
 Local paths: `agent/evals/datasets/<name>/examples.json`.  
 Catalog: `DATASET_CATALOG` in `dataset_io.py`. Default CLI name: `mila-smoke-v1`.
@@ -175,6 +175,9 @@ uv run python evals/run_eval.py --name mila-roles-v1 --sync
 uv run python evals/run_eval.py --name mila-pii-v1 --sync
 uv run python evals/run_eval.py --name mila-safety-v1 --sync
 
+cd ../ingest && uv run mila-ingest --recreate --include-adversarial
+cd ../agent && uv run python evals/run_eval.py --name mila-adversarial-v1 --sync
+
 MILA_EVAL_DATASET=mila-smoke-v1 uv run pytest -m langsmith
 ```
 
@@ -182,7 +185,6 @@ Env: `LANGSMITH_API_KEY`, Gemini, `QDRANT_URL` as needed — `agent/config/.env.
 
 ## Future
 
-- Fill `mila-adversarial-v1` after ADV ingest ([guardrails](./guardrails.md)).
 - Optional per-dataset evaluator lists.
 - Dedicated LangSmith workspace for Mila (optional hygiene).
 

@@ -12,7 +12,7 @@ Offline experiments for the Mila agent. No dedicated HTTP/auth endpoint — `eva
 | `mila-roles-v1` | Logged-in RBAC allow vs reject | Yes |
 | `mila-pii-v1` | Mask / allow contact by role; public cannot see internal roster | Yes |
 | `mila-safety-v1` | Out-of-guideline: code exec, prompt injection, hate, violence | No |
-| `mila-adversarial-v1` | **Future** — corpus injection after `mila-ingest --include-adversarial` | Yes + ADV docs |
+| `mila-adversarial-v1` | Corpus injection / authority spoof (ADV-* docs) | Yes + `--include-adversarial` |
 
 Local goldens: `agent/evals/datasets/<name>/examples.json`.
 
@@ -78,15 +78,19 @@ uv run python evals/run_eval.py --name mila-smoke-v1 --sync
 uv run python evals/run_eval.py --name mila-roles-v1 --sync
 uv run python evals/run_eval.py --name mila-pii-v1 --sync
 uv run python evals/run_eval.py --name mila-safety-v1 --sync
+
+# after ADV ingest:
+cd ../ingest && uv run mila-ingest --recreate --include-adversarial
+cd ../agent && uv run python evals/run_eval.py --name mila-adversarial-v1 --sync
 ```
 
 Requires `LANGSMITH_API_KEY` and Gemini in `agent/config/.env*`.
 
 Pytest: `MILA_EVAL_DATASET=mila-smoke-v1 uv run pytest -m langsmith`.
 
-## Adversarial (later)
+## Adversarial
 
-Keep `mila-adversarial-v1` empty until ADV docs are ingested. Assert no role elevation / email dumps / “CEO override” compliance. Separate from `mila-safety-v1` (user-message abuse vs retrieved-doc abuse).
+`mila-adversarial-v1` probes **retrieved-doc** abuse (role elevation, SYSTEM fences, fake CISO/FAQ overrides, PII-append notes). Separate from `mila-safety-v1` (user-message abuse). Requires Qdrant rebuilt with `--include-adversarial`.
 
 ## Related
 
