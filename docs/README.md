@@ -10,7 +10,8 @@ Design and implementation notes for the take-home prototype. Code lives under `a
 | [OAuth + RBAC](./oauth-rbac.md) | Mock OIDC, session cookie, `auth_mode`, role → document filters |
 | [PII handling](./pii.md) | Detect at ingest, store spans, anonymize before LLM by role |
 | [Evaluation strategy](./evaluation-strategy.md) | Datasets, experiments, judges, CLI, vs unit/e2e |
-| [Evals](./evals.md) | Short dataset + CLI cheat sheet |
+| [Datasets and experimentations (evals)](./evals.md) | Dataset names, example shape, sync/run CLI cheat sheet |
+| [LangSmith UI](./langsmith.md) | Evals + observability screenshots (datasets, experiments, traces, monitoring) |
 | [Guardrails](./guardrails.md) | Composable rails + hooks diagram |
 
 Assignment brief and corpus: [`../instructions/`](../instructions/).

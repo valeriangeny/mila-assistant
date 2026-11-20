@@ -190,6 +190,8 @@ Env: `LANGSMITH_API_KEY`, Gemini, `QDRANT_URL` as needed — `agent/config/.env.
 
 ## Related
 
+- [LangSmith UI](./langsmith.md) (evals + monitoring screenshots)
+- [Datasets and experimentations (evals)](./evals.md)
 - [Guardrails](./guardrails.md)
 - [PII](./pii.md)
 - [OAuth + RBAC](./oauth-rbac.md)
