@@ -116,10 +116,9 @@ export function ChatAuthDemo({ user, authMode, onContinueIncognito }: Props) {
     window.location.href = authLoginHref();
   }, []);
 
-  // CopilotKit expects "enabled" | "disabled" (boolean false does NOT disable).
-  const signInAvailable = authMode !== 'authenticated' ? 'enabled' : 'disabled';
-  const switchAvailable = authMode === 'authenticated' ? 'enabled' : 'disabled';
-
+  // CopilotKit core treats both `false` and `"disabled"` as off (v2 types: boolean).
+  const signInAvailable = authMode !== 'authenticated';
+  const switchAvailable = authMode === 'authenticated';
   useFrontendTool(
     {
       name: 'prompt_sign_in',

@@ -22,7 +22,21 @@ Requires [uv](https://docs.astral.sh/uv/).
 ```bash
 cd agent
 uv sync
-cp config/.env.example config/.env.local   # set GOOGLE_API_KEY or Vertex project
+cp config/.env.example config/.env.local
+```
+
+`config/.env.local`:
+
+```bash
+GOOGLE_API_KEY=          # or Vertex: GOOGLE_CLOUD_PROJECT + GOOGLE_CLOUD_LOCATION
+GEMINI_MODEL=gemini-3.5-flash-lite
+GEMINI_THINKING_LEVEL=low
+QDRANT_URL=http://127.0.0.1:6333
+QDRANT_COLLECTION=mila_docs
+EMBEDDING_MODEL=BAAI/bge-small-en-v1.5
+# LANGSMITH_TRACING=true
+# LANGSMITH_API_KEY=
+# LANGSMITH_PROJECT=Mila Agent - local:2024
 ```
 
 ## CLI

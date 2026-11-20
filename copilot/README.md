@@ -17,7 +17,7 @@ yarn dev:copilot
 # http://localhost:4000
 ```
 
-`copilot/.env.local`:
+`copilot/.env.local` (or `cp .env.local.example .env.local`):
 
 ```bash
 LANGGRAPH_URL=http://127.0.0.1:2024
