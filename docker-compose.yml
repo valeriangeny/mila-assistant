@@ -13,6 +13,18 @@ services:
       retries: 10
       start_period: 5s
 
+  # Required by langchain/langgraph-api (licensed image). Local DB falls back to sqlite.
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 3s
+
   agent:
     build:
       context: ./agent
@@ -21,6 +33,7 @@ services:
       - '2024:8080'
     environment:
       PORT: '8080'
+      REDIS_URI: redis://redis:6379
       QDRANT_URL: http://qdrant:6333
       QDRANT_COLLECTION: mila_docs
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}
@@ -33,6 +46,8 @@ services:
       LANGSMITH_PROJECT: ${LANGSMITH_PROJECT:-Mila Agent - compose}
     depends_on:
       qdrant:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   copilot:

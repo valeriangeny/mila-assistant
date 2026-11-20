@@ -17,22 +17,24 @@ Permission-aware internal knowledge assistant for the hypothetical **aliM AI Ins
 **Install / build / run (local + Docker):** [`docs/install-and-run.md`](docs/install-and-run.md)  
 Design index: [`docs/README.md`](docs/README.md)
 
-## Quick start
+## Quick start (local recommended)
 
 ```bash
-# Credentials for Compose (or use agent/config/.env.local for local agent)
-cp agent/config/.env.example .env   # set GOOGLE_API_KEY=…
+# Agent credentials
+cp agent/config/.env.example agent/config/.env.local   # set GOOGLE_API_KEY=…
+cp copilot/.env.local.example copilot/.env.local       # optional overrides
 
 # Load corpus into Qdrant (starts Qdrant if needed)
 ./scripts/setup.sh
 
-# Option A — full stack in Docker
-docker compose up --build
-
-# Option B — local agent + UI (Qdrant still via Docker)
+# Recommended — local agent + UI (Qdrant via Docker)
 cd agent && uv sync --extra dev && uv run langgraph dev --no-browser --no-reload
 # other terminal:
 yarn install && yarn dev:copilot
+
+# Optional — full stack in Docker (requires LangSmith key with LangGraph deploy access)
+# cp agent/config/.env.example .env  # set GOOGLE_API_KEY + LANGSMITH_API_KEY
+# docker compose up --build
 ```
 
 | Service | URL |

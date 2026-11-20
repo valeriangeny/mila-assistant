@@ -8,7 +8,7 @@ import os
 import sys
 from pathlib import Path
 
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 
 from mila_ingest.chunk import docs_to_chunks
 from mila_ingest.embed import embed_texts
@@ -21,10 +21,23 @@ def _repo_root() -> Path:
 
 
 def _load_env() -> None:
+    """Load file env without clobbering process exports (Compose sets QDRANT_URL)."""
     root = _repo_root()
-    load_dotenv(root / ".env")
-    load_dotenv(root / "agent" / "config" / ".env.local", override=True)
-    load_dotenv(root / "ingest" / ".env", override=True)
+    preset = set(os.environ)
+    merged: dict[str, str] = {}
+    for path in (
+        root / ".env",
+        root / "agent" / "config" / ".env.local",
+        root / "ingest" / ".env",
+    ):
+        if not path.is_file():
+            continue
+        for key, value in dotenv_values(path).items():
+            if value is not None:
+                merged[key] = value
+    for key, value in merged.items():
+        if key not in preset:
+            os.environ[key] = value
 
 
 def _load_jsonl(path: Path) -> list[dict]:
