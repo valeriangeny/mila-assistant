@@ -13,42 +13,33 @@ Permission-aware internal knowledge assistant for the hypothetical **aliM AI Ins
 | [`ingest/`](ingest/) | Corpus → Qdrant |
 | [`infra/`](infra/) | Mock OIDC + parked Terraform |
 
-See [`docs/README.md`](docs/README.md) for the design index.
+**Install / build / run (local + Docker):** [`docs/install-and-run.md`](docs/install-and-run.md)  
+Design index: [`docs/README.md`](docs/README.md)
 
-## Phase 1 stack
+## Quick start
 
 ```bash
-# Option A — compose (Qdrant + agent image + copilot)
-export GOOGLE_API_KEY=…   # or Vertex ADC vars
+# Credentials for Compose (or use agent/config/.env.local for local agent)
+cp agent/config/.env.example .env   # set GOOGLE_API_KEY=…
+
+# Load corpus into Qdrant (starts Qdrant if needed)
+./scripts/setup.sh
+
+# Option A — full stack in Docker
 docker compose up --build
 
-# Option B — local agent + UI
-cd agent && uv sync --extra dev
-cp config/.env.example config/.env.local
-uv run langgraph dev          # :2024, graph mila_agent
-
-# other terminal (repo root)
-yarn install && yarn dev:copilot   # :4000
+# Option B — local agent + UI (Qdrant still via Docker)
+cd agent && uv sync --extra dev && uv run langgraph dev --no-browser --no-reload
+# other terminal:
+yarn install && yarn dev:copilot
 ```
 
 | Service | URL |
 | --- | --- |
-| Qdrant | http://127.0.0.1:6333 |
-| Agent Server | http://127.0.0.1:2024 |
 | Copilot | http://127.0.0.1:4000 |
-
-## Vector DB (Qdrant) + local embeddings
+| Agent Server | http://127.0.0.1:2024 |
+| Qdrant | http://127.0.0.1:6333 |
 
 Embeddings use **FastEmbed** in-process (`BAAI/bge-small-en-v1.5`) — no embed API key. Gemini is only for the chat LLM.
 
-```bash
-docker compose up -d qdrant
-cd ingest && uv sync
-uv run mila-ingest --recreate
-```
-
-Or: `docker compose --profile ingest run --rm ingest`
-
-See [`ingest/README.md`](ingest/README.md). RBAC: [`docs/oauth-rbac.md`](docs/oauth-rbac.md). PII: [`docs/pii.md`](docs/pii.md) (detect at ingest, anonymize at retrieve).
-
-See [`instructions/Take-Home Assignment.md`](instructions/Take-Home%20Assignment.md).
+See [`ingest/README.md`](ingest/README.md). RBAC: [`docs/oauth-rbac.md`](docs/oauth-rbac.md). PII: [`docs/pii.md`](docs/pii.md). Assignment: [`instructions/Take-Home Assignment.md`](instructions/Take-Home%20Assignment.md).

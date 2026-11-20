@@ -55,13 +55,13 @@ docker compose up --build
 - Agent: http://127.0.0.1:2024
 - Copilot UI: http://127.0.0.1:4000
 
-Populate the index first (`cd ingest && uv run mila-ingest --recreate`) so retrieval returns hits.
+Populate the index first (`./scripts/setup.sh` from repo root) so retrieval returns hits. See [`docs/install-and-run.md`](../docs/install-and-run.md).
 
 ## Evals (LangSmith)
 
-Local goldens under `evals/datasets/{name}/examples.json`, sync ↔ LangSmith, then `client.evaluate`. Suites: `mila-smoke-v1`, `mila-roles-v1`, `mila-pii-v1`, `mila-safety-v1` (+ empty `mila-adversarial-v1`). See [`docs/evaluation-strategy.md`](../docs/evaluation-strategy.md) and [`docs/evals.md`](../docs/evals.md).
+Local goldens under `evals/datasets/{name}/examples.json`, sync ↔ LangSmith, then `client.evaluate`. Suites: `mila-smoke-v1`, `mila-roles-v1`, `mila-pii-v1`, `mila-safety-v1`, `mila-adversarial-v1`. See [`docs/evaluation-strategy.md`](../docs/evaluation-strategy.md) and [`docs/evals.md`](../docs/evals.md).
 
-Needs Qdrant ingested (`cd ingest && uv run mila-ingest --recreate`) for smoke/roles/pii; `LANGSMITH_API_KEY` + Gemini in `config/.env.local`.
+Needs Qdrant ingested (`cd ingest && uv run mila-ingest --recreate`) for smoke/roles/pii; add `--include-adversarial` for `mila-adversarial-v1`. `LANGSMITH_API_KEY` + Gemini in `config/.env.local`.
 
 ```bash
 cd agent

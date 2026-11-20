@@ -21,7 +21,7 @@ DATASET_CATALOG = {
     "mila-roles-v1": "Logged-in RBAC: allow vs reject by role × document.",
     "mila-pii-v1": "Role-based PII mask / redact / refuse on retrieved text.",
     "mila-safety-v1": "Malicious / out-of-guideline prompts (injection, code exec, hate, violence).",
-    "mila-adversarial-v1": "Future: corpus prompt-injection after --include-adversarial ingest.",
+    "mila-adversarial-v1": "Retrieved-doc injection / authority spoof (needs --include-adversarial ingest).",
 }
 
 # LangGraph Studio / chat experiments expect inputs.messages (not inputs.question).

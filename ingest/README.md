@@ -4,6 +4,16 @@ Load `instructions/*.jsonl` into **Qdrant** using **local FastEmbed** (`BAAI/bge
 
 ## Setup
 
+From repo root (preferred):
+
+```bash
+./scripts/setup.sh                 # Qdrant up + main corpus
+./scripts/setup.sh --adversarial   # + ADV-* docs
+./scripts/setup.sh --docker        # ingest via Compose profile
+```
+
+Manual:
+
 ```bash
 docker compose up -d qdrant
 
@@ -13,6 +23,8 @@ uv run mila-ingest --recreate
 # optional adversarial corpus:
 uv run mila-ingest --recreate --include-adversarial
 ```
+
+Full install paths: [`docs/install-and-run.md`](../docs/install-and-run.md).
 
 First run downloads the FastEmbed ONNX model (spaCy `en_core_web_sm` comes from `uv sync`); later runs are offline.
 

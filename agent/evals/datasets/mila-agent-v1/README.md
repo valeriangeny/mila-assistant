@@ -4,6 +4,6 @@ Deprecated umbrella name. Use the split datasets instead:
 - `mila-roles-v1`
 - `mila-pii-v1`
 - `mila-safety-v1`
-- `mila-adversarial-v1` (future)
+- `mila-adversarial-v1`
 
 See [`docs/evals.md`](../../../../docs/evals.md).
